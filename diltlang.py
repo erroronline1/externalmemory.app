@@ -44,7 +44,7 @@ def language(chunk, lang):
 		},
 
 		"aboutTitle":{
-			"en": "about",
+			"en": "About",
 			"de": "Über die App"
 		},
 		"aboutText":{
