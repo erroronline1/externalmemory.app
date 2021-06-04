@@ -1,9 +1,9 @@
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty
+from kivy.storage.dictstore import DictStore
 import json
 import cv2
 from pyzbar import pyzbar
@@ -31,6 +31,18 @@ class Screen(BoxLayout):
 					self.ids[element].texture = kwargs[arg]
 				elif arg=='state':
 					self.ids[element].state = kwargs[arg]
+				
+				elif arg=='mydata':
+					text=self.content('mydataDefault')
+					if DiltApp.storage:
+						currentstorage={}
+						for key in DiltApp.storage:
+							currentstorage[key]=DiltApp.storage[key]
+						text=json.dumps(currentstorage, indent=4)
+					self.ids['mydata'].text = text
+					return text
+
+			return
 		# else return default language chunks
 		lang = "en"
 		return language(element, lang)
@@ -48,11 +60,10 @@ class Screen(BoxLayout):
 			"description" : self.ids.mynotes.text,
 			"rating" : rating
 		})
-		self.content('mydata', text=json.dumps(DiltApp.productrating, indent=4))
-
+		self.content('mydata', mydata=True)
 
 class DiltApp(App): # <- Main Class
-	productrating=[]
+	storage = DictStore('diltstorage.json')
 
 	def build(self):
 		self.capture = cv2.VideoCapture(0)
@@ -86,29 +97,22 @@ class DiltApp(App): # <- Main Class
 		return frame
 
 	def save(self, values):
-		known = False
-		for i, el in enumerate(self.productrating):
-			if self.productrating[i]['code'] == values['code']:
-				self.productrating[i]['description'] = values['description']
-				self.productrating[i]['rating'] = values['rating']
-				known = True
-		if not known:
-			self.productrating.append(values)
+		self.storage.put(values['code'], description=values['description'], rating=values['rating'])
 
-	def lookup(self, id):
-		mynotes=''
-		good= False
-		meh=False
+	def lookup(self, code):
+		mynotes = ''
+		good = False
+		meh =False
 		bad = False
-		for i, el in enumerate(self.productrating):
-			if self.productrating[i]['code'] == id:
-				mynotes = self.productrating[i]['description']
-				if self.productrating[i]['rating'] == 2:
-					good = True
-				if self.productrating[i]['rating'] == 1:
-					meh = True
-				if self.productrating[i]['rating'] == 0:
-					bad = True
+		if self.storage.exists(code):
+			mynotes = self.store.get(code)['description']
+			if self.store.get(code)['rating'] == 2:
+				good = True
+			if self.store.get(code)['rating'] == 1:
+				meh = True
+			if self.store.get(code)['rating'] == 0:
+				bad = True
+
 		self.Screen.content('mynotes', text = mynotes)
 		self.Screen.content('good', state = 'down' if good else 'normal')
 		self.Screen.content('meh', state = 'down' if meh else 'normal')
