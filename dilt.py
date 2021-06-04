@@ -3,12 +3,25 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty
-from kivy.storage.dictstore import DictStore
+from kivy.storage.jsonstore import JsonStore # in hope kivy handles the respective permissions for storage access after compiling
 import json
 import cv2
 from pyzbar import pyzbar
 
 from diltlang import language
+
+'''
+todo
+
+language selection
+barcode api for product information
+styling
+some uid
+server api
+
+
+'''
+
 
 class Screen(BoxLayout):
 	camimage = ObjectProperty(None)
@@ -25,22 +38,24 @@ class Screen(BoxLayout):
 		if len(kwargs):
 			for arg in kwargs:
 				# conditional property check because dynamic assignment throws an unsubscriptable type error
-				if arg=='text':
+				if arg == 'text':
 					self.ids[element].text = kwargs[arg]
-				elif arg=='texture':
+				elif arg == 'texture':
 					self.ids[element].texture = kwargs[arg]
-				elif arg=='state':
+				elif arg == 'state':
 					self.ids[element].state = kwargs[arg]
 				
-				elif arg=='mydata':
-					text=self.content('mydataDefault')
+				# custom property handlings
+				elif arg == 'mydata':
+					text = self.content('mydataDefault')
 					if DiltApp.storage:
+						print (DiltApp.storage)
 						currentstorage={}
 						for key in DiltApp.storage:
-							currentstorage[key]=DiltApp.storage[key]
-						text=json.dumps(currentstorage, indent=4)
-					self.ids['mydata'].text = text
-					return text
+							currentstorage[key] = DiltApp.storage[key]
+						text = json.dumps(currentstorage, indent=4)
+					self.ids['mydata'].text = text # update after storing
+					return text # default return for initializing app
 
 			return
 		# else return default language chunks
@@ -56,19 +71,23 @@ class Screen(BoxLayout):
 				rating = states.index(el)
 		################ create rating summary
 		DiltApp.save(DiltApp, {
-			"code" : self.ids.detectedcode.text,
-			"description" : self.ids.mynotes.text,
-			"rating" : rating
+			"code": self.ids.detectedcode.text,
+			"description": self.ids.mynotes.text,
+			"rating": rating
 		})
 		self.content('mydata', mydata=True)
 
+	def clearData(self):
+		DiltApp.storage.clear()
+		self.content('mydata', mydata=True)
+
 class DiltApp(App): # <- Main Class
-	storage = DictStore('diltstorage.json')
+	storage = JsonStore('diltstorage.json')
 
 	def build(self):
 		self.capture = cv2.VideoCapture(0)
 		Clock.schedule_interval(self.camupdate, 1.0 / 60)
-		self.Screen=Screen()
+		self.Screen = Screen()
 		return self.Screen
 
 	def camupdate(self, dt):
@@ -79,8 +98,8 @@ class DiltApp(App): # <- Main Class
 			buf1 = cv2.flip(frame, 0)
 			buf = buf1.tostring()
 			image_texture = Texture.create(
-				size = (frame.shape[1], frame.shape[0]), colorfmt = 'bgr')
-			image_texture.blit_buffer(buf, colorfmt = 'bgr', bufferfmt = 'ubyte')
+				size = (frame.shape[1], frame.shape[0]), colorfmt='bgr')
+			image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
 			################ display image from the texture
 			self.Screen.content('camimage', texture = image_texture)
 
@@ -91,9 +110,9 @@ class DiltApp(App): # <- Main Class
 			barcode_info = barcode.data.decode('utf-8')
 			cv2.rectangle(frame, (x, y),(x+w, y+h), (0, 255, 0), 2)
 			############### pass result to label
-			detected=barcode.type + " | " + barcode_info
+			detected = barcode.type + " | " + barcode_info
 			self.lookup(detected)
-			self.Screen.content('detectedcode', text = detected)
+			self.Screen.content('detectedcode', text=detected)
 		return frame
 
 	def save(self, values):
@@ -102,7 +121,7 @@ class DiltApp(App): # <- Main Class
 	def lookup(self, code):
 		mynotes = ''
 		good = False
-		meh =False
+		meh = False
 		bad = False
 		if self.storage.exists(code):
 			mynotes = self.store.get(code)['description']
@@ -117,6 +136,9 @@ class DiltApp(App): # <- Main Class
 		self.Screen.content('good', state = 'down' if good else 'normal')
 		self.Screen.content('meh', state = 'down' if meh else 'normal')
 		self.Screen.content('bad', state = 'down' if bad else 'normal')
+
+	def clearData(self):
+		self.store.clear()
 
 	def on_stop(self):
 		#without this, app will not exit even if the window is closed

@@ -35,20 +35,20 @@ def language(chunk, lang):
 			"de": "Meine Daten"
 		},
 		"mydataDefault":{
-			"en": "Your data is stored on your device only by default. You can push and restore it to and from the cloud manually.",
-			"de": "Deine Daten werden standardmäßig nur auf deinem Gerät gespeichert. Du kannst sie manuell in die Cloud hochladen oder von dort wiederherstellen." 
+			"en": "You have no data stored yet. Your data is stored on your device only by default. You can push and restore it to and from the server manually.",
+			"de": "Du hast noch keine Daten gespeichert. Deine Daten werden standardmäßig nur auf deinem Gerät gespeichert. Du kannst sie manuell auf den Server hochladen oder von dort wiederherstellen." 
 		},
 		"mydataClear":{
 			"en": "clear all data from device",
 			"de": "alle Daten auf dem Gerät löschen"
 		},
 		"mydataPush":{
-			"en": "push",
-			"de": "hochladen"
+			"en": "push to server",
+			"de": "auf den Server hochladen"
 		},
 		"mydataRestore":{
-			"en": "restore",
-			"de": "wiederherstellen"
+			"en": "restore from server",
+			"de": "vom Server wiederherstellen"
 		},
 
 		"aboutTitle":{
