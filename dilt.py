@@ -1,23 +1,16 @@
 from kivy.app import App
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.accordion import Accordion, AccordionItem
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.label import Label
-from kivy.uix.image import Image
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.uix.togglebutton import ToggleButton
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.uix.widget import Widget
-from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, Property
+from kivy.uix.boxlayout import BoxLayout
+from kivy.properties import ObjectProperty
 import json
 import cv2
 from pyzbar import pyzbar
 
 from diltlang import language
 
-class Screen(Widget):
+class Screen(BoxLayout):
 	camimage = ObjectProperty(None)
 	detectedcode = ObjectProperty(None)
 	mynotes = ObjectProperty(None)
@@ -28,6 +21,7 @@ class Screen(Widget):
 	mydata = ObjectProperty(None)
 
 	def content(self, element, **kwargs):
+		# update content during runtime if kwargs are provided
 		if len(kwargs):
 			for arg in kwargs:
 				# conditional property check because dynamic assignment throws an unsubscriptable type error
@@ -37,6 +31,7 @@ class Screen(Widget):
 					self.ids[element].texture = kwargs[arg]
 				elif arg=='state':
 					self.ids[element].state = kwargs[arg]
+		# else return default language chunks
 		lang = "en"
 		return language(element, lang)
 	
@@ -48,7 +43,7 @@ class Screen(Widget):
 			if el.state == "down":
 				rating = states.index(el)
 		################ create rating summary
-		DiltApp.store(DiltApp, {
+		DiltApp.save(DiltApp, {
 			"code" : self.ids.detectedcode.text,
 			"description" : self.ids.mynotes.text,
 			"rating" : rating
@@ -90,7 +85,7 @@ class DiltApp(App): # <- Main Class
 			self.Screen.content('detectedcode', text = detected)
 		return frame
 
-	def store(self, values):
+	def save(self, values):
 		known = False
 		for i, el in enumerate(self.productrating):
 			if self.productrating[i]['code'] == values['code']:

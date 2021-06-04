@@ -10,72 +10,69 @@
 
 	mydata: mydata
 
-	GridLayout:
-		cols:1
-		size: root.width * .8, root.height
-		pos: root.width * .5 - self.width * .5, 0
-		Accordion:
-			orientation: "vertical"
-			AccordionItem:
-				title: root.content("diltTitle")
-				collapse: False
-				GridLayout:
-					cols:1
-					Image:
-						id: camimage
-						size_hint: (4, 4)
-						allow_stretch: True
-						keep_ratio: True
-					Label:
-						id: detectedcode
-						text: root.content("diltDetectedcode")
-						size_hint: (.5, .5)
-					Label:
-						text: root.content("diltMynotes")
-						size_hint: (.5, .5)
-					TextInput:
-						id: mynotes
-					ToggleButton:
-						id: good
-						group: "rating"
-						text: root.content("diltGood")
-						size_hint: (.5, .5)
-					ToggleButton:
-						id: meh
-						group: "rating"
-						text: root.content("diltMeh")
-						size_hint: (.5, .5)
-					ToggleButton:
-						id: bad
-						group: "rating"
-						text: root.content("diltBad")
-						size_hint: (.5, .5)
-					Button:
-						text: root.content("diltSave")
-						size_hint: (.5, .5)
-						on_release: root.savefn()
-			AccordionItem:
-				title: root.content("mydataTitle")
-				GridLayout:
-					cols: 1
-					ScrollView:
-						Label:
-							id: mydata
-							size_hint_y: None
-							text_size: self.width, None
-							height: self.texture_size[1]
-							text:"Your data ist stored on your device only by default. You can push and restore it to and from the cloud manually. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Your data ist stored on your device only by default. You can push and restore it to and from the cloud manually. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
-					Button:
-						text: root.content("mydataPush")
-						size_hint: (.15, .15)
-					Button:
-						text: root.content("mydataRestore")
-						size_hint: (.15, .15)
-			AccordionItem:
-				title: root.content("aboutTitle")
-				ScrollView:
-					Label:
-						text: root.content("aboutText")
-						size_hint_y: None
-						text_size: self.width, None
-						height: self.texture_size[1]
+	fullscreen: True
+	Carousel:
+		GridLayout:
+			cols:1
+			Label:
+				text: root.content("diltTitle")
+			Image:
+				id: camimage
+				size_hint: (4, 4)
+				allow_stretch: True
+				keep_ratio: True
+			Label:
+				id: detectedcode
+				text: root.content("diltDetectedcode")
+				size_hint: (.5, .5)
+			Label:
+				text: root.content("diltMynotes")
+				size_hint: (.5, .5)
+			TextInput:
+				id: mynotes
+			ToggleButton:
+				id: good
+				group: "rating"
+				text: root.content("diltGood")
+				size_hint: (.5, .5)
+			ToggleButton:
+				id: meh
+				group: "rating"
+				text: root.content("diltMeh")
+				size_hint: (.5, .5)
+			ToggleButton:
+				id: bad
+				group: "rating"
+				text: root.content("diltBad")
+				size_hint: (.5, .5)
+			Button:
+				text: root.content("diltSave")
+				size_hint: (.5, .5)
+				on_release: root.savefn()
+		GridLayout:
+			cols:1
+			Label:
+				text: root.content("mydataTitle")
+			ScrollView:
+				Label:
+					id: mydata
+					size_hint_y: None
+					text_size: self.width, None
+					height: self.texture_size[1]
+					text:"Your data ist stored on your device only by default. You can push and restore it to and from the cloud manually. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Your data ist stored on your device only by default. You can push and restore it to and from the cloud manually. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+			Button:
+				text: root.content("mydataPush")
+				size_hint: (.15, .15)
+			Button:
+				text: root.content("mydataRestore")
+				size_hint: (.15, .15)
+		GridLayout:
+			cols:1
+			Label:
+				text: root.content("aboutTitle")
+			ScrollView:
+				Label:
+					text: root.content("aboutText")
+					size_hint_y: None
+					text_size: self.width, None
+					height: self.texture_size[1]
