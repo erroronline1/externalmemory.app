@@ -174,7 +174,7 @@ class DiltApp(App): # <- Main Class
 		return frame
 
 	def save(self, values):
-		self.storage.put(values['code'], note=values['note'], rating=values['rating'])
+		self.storage.put(values['code'], memo=values['note'], rating=values['rating'])
 
 	def lookup(self, code):
 		mynotes = ''
@@ -182,7 +182,7 @@ class DiltApp(App): # <- Main Class
 		meh = False
 		bad = False
 		if self.storage.exists(code):
-			mynotes = self.storage.get(code)['note']
+			mynotes = self.storage.get(code)['memo']
 			if self.storage.get(code)['rating'] == 2:
 				good = True
 			if self.storage.get(code)['rating'] == 1:
