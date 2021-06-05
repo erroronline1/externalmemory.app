@@ -63,13 +63,21 @@ def language(chunk, lang):
 			"de": "vom Server wiederherstellen"
 		},
 
-		"aboutTitle":{
-			"en": "About",
-			"de": "Über die App"
-		},
 		"aboutSettings":{
 			"en": "Settings",
 			"de": "Einstellungen"
+		},
+		"aboutLanguage":{
+			"en": "Language",
+			"de": "Sprache"
+		},
+		"aboutCam":{
+			"en": "Camera",
+			"de": "Kamera"
+		},
+		"aboutTitle":{
+			"en": "About",
+			"de": "Über die App"
 		},
 		"aboutText":{
 			"en": "this app is awesome!",
