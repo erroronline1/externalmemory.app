@@ -10,8 +10,6 @@
 
 	mydata: mydata
 
-	languageSelection: languageSelection
-
 	fullscreen: True
 	Carousel:
 		GridLayout:
@@ -21,39 +19,44 @@
 			spacing: [0, 5]
 			Image:
 				source: "icon.png"
-				size_hint: (1, 1)
+				size_hint: (1, None)
+				height: 48
 			Image:
 				id: camimage
-				size_hint: (3, 3)
+				size_hint: (2, 2)
 				allow_stretch: True
 				keep_ratio: True
 			Label:
 				id: detectedcode
 				text: root.content("diltDetectedcode")
-				size_hint: (.5, .5)
+				size_hint: (1, None)
+				height: 32
 			Label:
 				text: root.content("diltMynotes")
-				size_hint: (.5, .5)
+				size_hint: (1, None)
+				height: 32
 			TextInput:
 				id: mynotes
-			ToggleButton:
-				id: good
-				group: "rating"
-				text: root.content("diltGood")
-				size_hint: (.5, .5)
-			ToggleButton:
-				id: meh
-				group: "rating"
-				text: root.content("diltMeh")
-				size_hint: (.5, .5)
-			ToggleButton:
-				id: bad
-				group: "rating"
-				text: root.content("diltBad")
-				size_hint: (.5, .5)
+			GridLayout:
+				cols: 3
+				spacing: [5, 0]
+				size_hint: (1, .5)
+				ToggleButton:
+					id: good
+					group: "rating"
+					text: root.content("diltGood")
+				ToggleButton:
+					id: meh
+					group: "rating"
+					text: root.content("diltMeh")
+				ToggleButton:
+					id: bad
+					group: "rating"
+					text: root.content("diltBad")
 			Button:
 				text: root.content("diltSave")
-				size_hint: (.5, .5)
+				size_hint: (1, None)
+				height: 48
 				on_release: root.savefn()
 		GridLayout:
 			cols:1
@@ -62,6 +65,8 @@
 			spacing: [0, 5]
 			Label:
 				text: root.content("mydataTitle")
+				size_hint: (1, None)
+				height: 48
 			ScrollView:
 				Label:
 					id: mydata
@@ -71,31 +76,54 @@
 					text: root.content("mydata", mydata= True)
 			Button:
 				text: root.content("mydataClear")
-				size_hint: (.15, .15)
+				size_hint: (1, None)
+				height: 48
 				on_release: root.clearData()
 			Button:
 				text: root.content("mydataPush")
-				size_hint: (.15, .15)
+				size_hint: (1, None)
+				height: 48
 			Button:
 				text: root.content("mydataRestore")
-				size_hint: (.15, .15)
+				size_hint: (1, None)
+				height: 48
 		GridLayout:
 			cols:1
 			size_hint: (.9, 1)
 			pos_hint: {'center': (.5, .5)}
 			spacing: [0, 5]
 			Label:
-				text: root.content("aboutTitle")
-			Label:
 				text: root.content("aboutSettings")
-			Spinner:
-				id: languageSelection
-				size_hint: None, None
-				size: 100, 44
-				pos_hint: {'center': (.5, .5)}
-				text: root.languageSettings('setting')
-				values: root.languageSettings('list')
-				on_text: root.languageSettings(self.text)
+				size_hint: (1, None)
+				height: 48
+			GridLayout:
+				cols:2
+				Label:
+					text:root.content("aboutLanguage")
+					size_hint: (1, None)
+					height: 48
+				Spinner:
+					pos_hint: {'center': (.5, .5)}
+					text: root.languageSettings('setting')
+					values: root.languageSettings('list')
+					on_text: root.languageSettings(self.text)
+					size_hint: (1, None)
+					height: 48
+				Label:
+					text:root.content("aboutCam")
+					size_hint: (1, None)
+					height: 48
+				Spinner:
+					pos_hint: {'center': (.5, .5)}
+					text: root.camSettings('setting')
+					values: root.camSettings('list')
+					on_text: root.camSettings(self.text)
+					size_hint: (1, None)
+					height: 48
+			Label:
+				text: root.content("aboutTitle")
+				size_hint: (1, None)
+				height: 48
 			ScrollView:
 				Label:
 					text: root.content("aboutText")
