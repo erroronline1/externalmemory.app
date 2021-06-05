@@ -23,12 +23,14 @@ server api
 '''
 
 setting = JsonStore('diltsettings.json')
-setLang='en'
+SETLANG = 'en'
 if setting.exists('language'):
 	for el in languageSupport():
 		if el['name'] == setting.get('language')['set']:
-			setLang = el['abbrev']
+			SETLANG = el['abbrev']
 			break
+SETCAM = int(setting.get('cam')['set']) - 1 if setting.exists('cam') else 0
+
 
 class Screen(BoxLayout):
 	camimage = ObjectProperty(None)
@@ -56,7 +58,6 @@ class Screen(BoxLayout):
 				elif arg == 'mydata':
 					text = self.content('mydataDefault')
 					if DiltApp.storage:
-						print (DiltApp.storage)
 						currentstorage={}
 						for key in DiltApp.storage:
 							currentstorage[key] = DiltApp.storage[key]
@@ -66,7 +67,7 @@ class Screen(BoxLayout):
 
 			return
 		# else return default language chunks
-		return language(element, setLang)
+		return language(element, SETLANG)
 	
 	def languageSettings(self, arg):
 		if arg == 'list':
@@ -78,6 +79,17 @@ class Screen(BoxLayout):
 				return 'english'
 		else :
 			setting.put('language', set=arg)
+
+	def camSettings(self, arg):
+		if arg == 'list':
+			return ('1', '2')
+		elif arg == 'setting':
+			if setting.exists('cam'):
+				return setting.get('cam')['set']
+			else:
+				return str(SETCAM + 1)
+		else :
+			setting.put('cam', set=arg)
 	
 	def savefn(self):
 		################ read toggle buttons and translate choice into rating 0-2, note the different order 
@@ -89,7 +101,7 @@ class Screen(BoxLayout):
 		################ create rating summary
 		DiltApp.save(DiltApp, {
 			"code": self.ids.detectedcode.text,
-			"description": self.ids.mynotes.text,
+			"note": self.ids.mynotes.text,
 			"rating": rating
 		})
 		self.content('mydata', mydata=True)
@@ -99,14 +111,14 @@ class Screen(BoxLayout):
 			DiltApp.storage.clear()
 			self.content('mydata', mydata=True)
 		popup=ConfirmPopup()
-		popup.init(label=language("mydataClearConfirm", setLang), execute=execute)
+		popup.init(label=language("mydataClearConfirm", SETLANG), execute=execute)
 		popup.open()
 
 
 class ConfirmPopup(Popup):
 	text = StringProperty('')
-	ok_text = StringProperty(language("generalOK", setLang))
-	cancel_text = StringProperty(language("generalCancel", setLang))
+	ok_text = StringProperty(language("generalOK", SETLANG))
+	cancel_text = StringProperty(language("generalCancel", SETLANG))
 	__events__ = ('on_ok', 'on_cancel')
 	def init(self, **kwargs):
 		self.text=kwargs['label'] # decision
@@ -131,7 +143,7 @@ class DiltApp(App): # <- Main Class
 	storage = JsonStore('diltstorage.json')
 
 	def build(self):
-		self.capture = cv2.VideoCapture(0)
+		self.capture = cv2.VideoCapture(SETCAM)
 		Clock.schedule_interval(self.camupdate, 1.0 / 60)
 		self.Screen = Screen()
 		return self.Screen
@@ -162,7 +174,7 @@ class DiltApp(App): # <- Main Class
 		return frame
 
 	def save(self, values):
-		self.storage.put(values['code'], description=values['description'], rating=values['rating'])
+		self.storage.put(values['code'], note=values['note'], rating=values['rating'])
 
 	def lookup(self, code):
 		mynotes = ''
@@ -170,7 +182,7 @@ class DiltApp(App): # <- Main Class
 		meh = False
 		bad = False
 		if self.storage.exists(code):
-			mynotes = self.storage.get(code)['description']
+			mynotes = self.storage.get(code)['note']
 			if self.storage.get(code)['rating'] == 2:
 				good = True
 			if self.storage.get(code)['rating'] == 1:
