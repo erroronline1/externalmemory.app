@@ -2,18 +2,18 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import ObjectProperty
+from kivy.uix.popup import Popup
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.storage.jsonstore import JsonStore # in hope kivy handles the respective permissions for storage access after compiling
 import json
 import cv2
 from pyzbar import pyzbar
 
-from diltlang import language
+from diltlang import languageSupport, language
 
 '''
 todo
 
-language selection
 barcode api for product information
 styling
 some uid
@@ -22,6 +22,13 @@ server api
 
 '''
 
+setting = JsonStore('diltsettings.json')
+setLang='en'
+if setting.exists('language'):
+	for el in languageSupport():
+		if el['name'] == setting.get('language')['set']:
+			setLang = el['abbrev']
+			break
 
 class Screen(BoxLayout):
 	camimage = ObjectProperty(None)
@@ -59,8 +66,18 @@ class Screen(BoxLayout):
 
 			return
 		# else return default language chunks
-		lang = "en"
-		return language(element, lang)
+		return language(element, setLang)
+	
+	def languageSettings(self, arg):
+		if arg == 'list':
+			return tuple(el['name'] for el in languageSupport())
+		elif arg == 'setting':
+			if setting.exists('language'):
+				return setting.get('language')['set']
+			else:
+				return 'english'
+		else :
+			setting.put('language', set=arg)
 	
 	def savefn(self):
 		################ read toggle buttons and translate choice into rating 0-2, note the different order 
@@ -78,8 +95,37 @@ class Screen(BoxLayout):
 		self.content('mydata', mydata=True)
 
 	def clearData(self):
-		DiltApp.storage.clear()
-		self.content('mydata', mydata=True)
+		def execute():
+			DiltApp.storage.clear()
+			self.content('mydata', mydata=True)
+		popup=ConfirmPopup()
+		popup.init(label=language("mydataClearConfirm", setLang), execute=execute)
+		popup.open()
+
+
+class ConfirmPopup(Popup):
+	text = StringProperty('')
+	ok_text = StringProperty(language("generalOK", setLang))
+	cancel_text = StringProperty(language("generalCancel", setLang))
+	__events__ = ('on_ok', 'on_cancel')
+	def init(self, **kwargs):
+		self.text=kwargs['label'] # decision
+		self.execute=kwargs['execute'] # passed function on case of confirmation
+	def build(self):
+		self.Popup = Popup()
+		return self.Popup
+	def ok(self):
+		self.dispatch('on_ok')
+		self.dismiss()
+	def cancel(self):
+		self.dispatch('on_cancel')
+		self.dismiss()
+	def on_ok(self):
+		self.execute()
+		pass
+	def on_cancel(self):
+		pass
+
 
 class DiltApp(App): # <- Main Class
 	storage = JsonStore('diltstorage.json')
@@ -124,12 +170,12 @@ class DiltApp(App): # <- Main Class
 		meh = False
 		bad = False
 		if self.storage.exists(code):
-			mynotes = self.store.get(code)['description']
-			if self.store.get(code)['rating'] == 2:
+			mynotes = self.storage.get(code)['description']
+			if self.storage.get(code)['rating'] == 2:
 				good = True
-			if self.store.get(code)['rating'] == 1:
+			if self.storage.get(code)['rating'] == 1:
 				meh = True
-			if self.store.get(code)['rating'] == 0:
+			if self.storage.get(code)['rating'] == 0:
 				bad = True
 
 		self.Screen.content('mynotes', text = mynotes)
@@ -138,7 +184,7 @@ class DiltApp(App): # <- Main Class
 		self.Screen.content('bad', state = 'down' if bad else 'normal')
 
 	def clearData(self):
-		self.store.clear()
+		self.storage.clear()
 
 	def on_stop(self):
 		#without this, app will not exit even if the window is closed

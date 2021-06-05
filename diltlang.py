@@ -1,13 +1,21 @@
 # user interface and default values
+def languageSupport():
+	return [
+			{
+				"name": "english",
+				"abbrev": "en"
+			},
+			{
+				"name": "deutsch",
+				"abbrev": "de"
+			},
+		]
+
 def language(chunk, lang):
 	element={
-		"diltTitle":{
-			"en": "Do I Like That?",
-			"de": "Mag ich das?"
-		},
 		"diltDetectedcode":{
-			"en": "detected code...",
-			"de": "erkannter Code..."
+			"en": "scan code...",
+			"de": "scanne Code..."
 		},
 		"diltMynotes":{
 			"en": "my notes:",
@@ -42,6 +50,10 @@ def language(chunk, lang):
 			"en": "clear all data from device",
 			"de": "alle Daten auf dem Gerät löschen"
 		},
+		"mydataClearConfirm":{
+			"en": "really clear all data from device?",
+			"de": "Wirklich alle Daten auf dem Gerät löschen?"
+		},
 		"mydataPush":{
 			"en": "push to server",
 			"de": "auf den Server hochladen"
@@ -55,10 +67,23 @@ def language(chunk, lang):
 			"en": "About",
 			"de": "Über die App"
 		},
+		"aboutSettings":{
+			"en": "Settings",
+			"de": "Einstellungen"
+		},
 		"aboutText":{
 			"en": "this app is awesome!",
 			"de": "ganz tolle App!"
-		}
+		},
+
+		"generalOK":{
+			"en": "ok",
+			"de": "OK"
+		},
+		"generalCancel":{
+			"en": "cancel",
+			"de": "Abbrechen"
+		},
 	}
 	if chunk not in element:
 		return "This content snippet has not been declared yet"

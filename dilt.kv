@@ -10,15 +10,21 @@
 
 	mydata: mydata
 
+	languageSelection: languageSelection
+
 	fullscreen: True
 	Carousel:
 		GridLayout:
 			cols:1
-			Label:
-				text: root.content("diltTitle")
+			size_hint: (.9, 1)
+			pos_hint: {'center': (.5, .5)}
+			spacing: [0, 5]
+			Image:
+				source: "icon.png"
+				size_hint: (1, 1)
 			Image:
 				id: camimage
-				size_hint: (4, 4)
+				size_hint: (3, 3)
 				allow_stretch: True
 				keep_ratio: True
 			Label:
@@ -51,6 +57,9 @@
 				on_release: root.savefn()
 		GridLayout:
 			cols:1
+			size_hint: (.9, 1)
+			pos_hint: {'center': (.5, .5)}
+			spacing: [0, 5]
 			Label:
 				text: root.content("mydataTitle")
 			ScrollView:
@@ -72,11 +81,65 @@
 				size_hint: (.15, .15)
 		GridLayout:
 			cols:1
+			size_hint: (.9, 1)
+			pos_hint: {'center': (.5, .5)}
+			spacing: [0, 5]
 			Label:
 				text: root.content("aboutTitle")
+			Label:
+				text: root.content("aboutSettings")
+			Spinner:
+				id: languageSelection
+				size_hint: None, None
+				size: 100, 44
+				pos_hint: {'center': (.5, .5)}
+				text: root.languageSettings('setting')
+				values: root.languageSettings('list')
+				on_text: root.languageSettings(self.text)
 			ScrollView:
 				Label:
 					text: root.content("aboutText")
 					size_hint_y: None
 					text_size: self.width, None
 					height: self.texture_size[1]
+
+<-Popup>:
+	GridLayout:
+		cols: 1
+		padding: '12dp'
+		pos_hint: {'center': (0.5, 0.5)}
+		size_hint_x: 0.66
+		size_hint_y: None
+		height: self.minimum_height
+		
+		canvas:
+			Color:
+				rgba: root.background_color[:3] + [root.background_color[-1] * root._anim_alpha]
+			Rectangle:
+				size: root._window.size if root._window else (0, 0)
+			
+			Color:
+				rgb: 1, 1, 1
+			BorderImage:
+				source: root.background
+				border: root.border
+				pos: self.pos
+				size: self.size
+	
+		Label:
+			text: root.text
+			size_hint_y: None
+			height: self.texture_size[1] + dp(16)
+			text_size: self.width - dp(16), None
+			halign: 'center'
+		
+		BoxLayout:
+			size_hint_y: None
+			height: sp(48)
+			
+			Button:
+				text: root.cancel_text
+				on_press: root.cancel()
+			Button:
+				text: root.ok_text
+				on_press: root.ok()
