@@ -39,8 +39,8 @@ def language(chunk, lang):
 		},
 
 		"mydataTitle":{
-			"en": "My Data",
-			"de": "Meine Daten"
+			"en": "[size=24]My Data[/size]",
+			"de": "[size=24]Meine Daten[/size]"
 		},
 		"mydataDefault":{
 			"en": "You have no data stored yet. Your data is stored on your device only by default. You can push and restore it to and from the server manually.",
@@ -64,8 +64,8 @@ def language(chunk, lang):
 		},
 
 		"aboutSettings":{
-			"en": "Settings",
-			"de": "Einstellungen"
+			"en": "[size=24]Settings[/size]",
+			"de": "[size=24]Einstellungen[/size]"
 		},
 		"aboutLanguage":{
 			"en": "Language",
@@ -75,13 +75,45 @@ def language(chunk, lang):
 			"en": "Camera",
 			"de": "Kamera"
 		},
+		"aboutSettingsApply":{
+			"en": "[size=10]please restart app for changes to take effect[/size]",
+			"de": "[size=10]App bitte neustarten damit die Änderungen wirksam werden[/size]"
+		},		
 		"aboutTitle":{
-			"en": "About",
-			"de": "Über die App"
+			"en": "[size=24]About[/size]",
+			"de": "[size=24]Über die App[/size]"
 		},
 		"aboutText":{
-			"en": "this app is awesome!",
-			"de": "ganz tolle App!"
+			"en": """
+When having a hard time to remember brands, this app helps by storing your personal rating for the product. 
+Scan the barcode and rate the product. If a product crosses your way and you are unsure if you liked it, just scan the barcode.
+You can add your notes and always change your mind!
+
+[size=24]Your Data[/size]
+Your data is stored on your device only by default. You can delete it, or store and restore it to and from the webserver manually.
+
+[size=24]Data Usage[/size]
+Eventually I try to monetize the data on the webserver. Ratings are anonymous per se unless you provide personal information within the memo intentionally.
+
+© 2021 by error on line 1 (erroronline.one)
+made with <3, python, kivy and hardly knowing what i am doing
+colours from nordtheme
+""",
+			"de": """
+Bei Schwierigkeiten sich Marken zu merken hilft diese App durch Speichern deiner persönlichen Bewertungen für das Produkt.
+Scanne den Barcode und bewerte das Produkt. Wenn dir ein Produkt über den Weg läuft und du nicht mehr weißt, ob du es mochtest, scanne einefach den Barcode.
+Du kannst deine eigenen Notizen hinzufügen und deine Meinung jederzeit ändern!
+
+[size=24]Deine Daten[/size]
+Deine Daten werden standardmäßig nur auf deinem Gerät gespeichert. Du kannst sie löschen oder auf dem Webserver speichern oder von dort wieder herstellen.
+
+[size=24]Datennutzung[/size]
+Irgendwann werde ich vielleicht versuchen die Daten auf dem Webserver zu Geld zu machen. Die Bewertungen für sich sind immer anonym, es sei denn du gibst in deinen Notizen absichtlich persönliche Daten an. 
+
+© 2021 by error on line 1 (erroronline.one)
+made with <3, python, kivy and hardly knowing what i am doing
+colours from nordtheme
+"""
 		},
 
 		"generalOK":{

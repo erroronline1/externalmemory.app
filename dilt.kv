@@ -1,6 +1,13 @@
 #:kivy 2.0.0
 
-<Screen>:
+<Screen>
+	canvas:
+		Color:
+			rgba: (.18, .20, .25, 1)
+		Rectangle:
+			size: self.size
+
+
 	camimage: camimage
 	detectedcode: detectedcode
 	mynotes: mynotes
@@ -55,8 +62,6 @@
 					text: root.content("diltBad")
 			Button:
 				text: root.content("diltSave")
-				size_hint: (1, None)
-				height: 48
 				on_release: root.savefn()
 		GridLayout:
 			cols:1
@@ -67,6 +72,7 @@
 				text: root.content("mydataTitle")
 				size_hint: (1, None)
 				height: 48
+				markup: True
 			ScrollView:
 				Label:
 					id: mydata
@@ -76,17 +82,11 @@
 					text: root.content("mydata", mydata= True)
 			Button:
 				text: root.content("mydataClear")
-				size_hint: (1, None)
-				height: 48
 				on_release: root.clearData()
 			Button:
 				text: root.content("mydataPush")
-				size_hint: (1, None)
-				height: 48
 			Button:
 				text: root.content("mydataRestore")
-				size_hint: (1, None)
-				height: 48
 		GridLayout:
 			cols:1
 			size_hint: (.9, 1)
@@ -96,8 +96,10 @@
 				text: root.content("aboutSettings")
 				size_hint: (1, None)
 				height: 48
+				markup: True
 			GridLayout:
 				cols:2
+				spacing: [0, 5]
 				Label:
 					text:root.content("aboutLanguage")
 					size_hint: (1, None)
@@ -107,8 +109,6 @@
 					text: root.languageSettings('setting')
 					values: root.languageSettings('list')
 					on_text: root.languageSettings(self.text)
-					size_hint: (1, None)
-					height: 48
 				Label:
 					text:root.content("aboutCam")
 					size_hint: (1, None)
@@ -118,18 +118,61 @@
 					text: root.camSettings('setting')
 					values: root.camSettings('list')
 					on_text: root.camSettings(self.text)
-					size_hint: (1, None)
-					height: 48
+			Label:
+				text: root.content("aboutSettingsApply")
+				size_hint: (1, None)
+				height: 16
+				markup: True
 			Label:
 				text: root.content("aboutTitle")
 				size_hint: (1, None)
 				height: 48
+				markup: True
 			ScrollView:
+				size_hint: (1, 3)
 				Label:
 					text: root.content("aboutText")
 					size_hint_y: None
 					text_size: self.width, None
 					height: self.texture_size[1]
+					markup: True
+
+<-Button, -ToggleButton, -Spinner, -SpinnerOption>
+	#background_color: 0, 0, 0, 0  # the last zero is the critical on, make invisible
+	canvas.before:
+		Color:
+			rgba: (.30, .34, .42, 1) if self.state=='normal' else (.56, .74, .73, 1)  # visual feedback of press
+		RoundedRectangle:
+			pos: self.pos
+			size: self.size
+			radius: [5,]
+		Color:
+			rgba: (.93, .94, .96, 1)
+		Rectangle:
+			texture: self.texture
+			size: self.texture_size
+			pos: int(self.center_x - self.texture_size[0] / 2.), int(self.center_y - self.texture_size[1] / 2.)
+	size_hint: (1, None)
+	height: 48
+
+<-TextInput>
+	canvas.before:
+		# border settings
+		Color:
+			rgba: (.90, .91, .94, 1)
+		RoundedRectangle:
+			pos: self.pos
+			size: self.size
+			radius: [5,]
+		#contentbox settings
+		Color:
+			rgba: (1,1,1,0)
+		Rectangle:
+			size: (self.width - self.border[1] - self.border[3], self.height - self.border[0] - self.border[2])
+			pos: (self.x + self.border[3], self.y + self.border[0])
+		# text color
+		Color:
+			rgba: (0,0,0,1)
 
 <-Popup>:
 	GridLayout:
@@ -142,12 +185,12 @@
 		
 		canvas:
 			Color:
-				rgba: root.background_color[:3] + [root.background_color[-1] * root._anim_alpha]
+				rgba: (.18, .20, .25, .5)#root.background_color[:3] + [root.background_color[-1] * root._anim_alpha]
 			Rectangle:
 				size: root._window.size if root._window else (0, 0)
 			
 			Color:
-				rgb: 1, 1, 1
+				rgba: (.93, .94, .96, 1)
 			BorderImage:
 				source: root.background
 				border: root.border
@@ -171,3 +214,4 @@
 			Button:
 				text: root.ok_text
 				on_press: root.ok()
+
