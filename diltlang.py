@@ -93,7 +93,7 @@ You can add your notes and always change your mind!
 Your data is stored on your device only by default. You can delete it, or store and restore it to and from the webserver manually.
 
 [size=24]Data Usage[/size]
-Eventually I try to monetize the data on the webserver. Ratings are anonymous per se unless you provide personal information within the memo intentionally.
+Eventually I try to monetize the data on the webserver by selling it to companies that are honestly interested in opinions on their product. Ratings are anonymous per se unless you provide personal information within the memo intentionally.
 
 © 2021 by error on line 1 (erroronline.one)
 made with <3, python, kivy and hardly knowing what i am doing
@@ -108,7 +108,7 @@ Du kannst deine eigenen Notizen hinzufügen und deine Meinung jederzeit ändern!
 Deine Daten werden standardmäßig nur auf deinem Gerät gespeichert. Du kannst sie löschen oder auf dem Webserver speichern oder von dort wieder herstellen.
 
 [size=24]Datennutzung[/size]
-Irgendwann werde ich vielleicht versuchen die Daten auf dem Webserver zu Geld zu machen. Die Bewertungen für sich sind immer anonym, es sei denn du gibst in deinen Notizen absichtlich persönliche Daten an. 
+Irgendwann werde ich vielleicht versuchen die Daten auf dem Webserver zu Geld zu machen indem ich sie an Firmen verkaufe die ehrlich an Meinungen zu ihren Produkten interessiert sind. Die Bewertungen für sich sind immer anonym, es sei denn du gibst in deinen Notizen absichtlich persönliche Daten an. 
 
 © 2021 by error on line 1 (erroronline.one)
 made with <3, python, kivy and hardly knowing what i am doing

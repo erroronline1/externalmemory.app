@@ -69,28 +69,6 @@ class Screen(BoxLayout):
 		# else return default language chunks
 		return language(element, SETLANG)
 	
-	def languageSettings(self, arg):
-		if arg == 'list':
-			return tuple(el['name'] for el in languageSupport())
-		elif arg == 'setting':
-			if setting.exists('language'):
-				return setting.get('language')['set']
-			else:
-				return 'english'
-		else :
-			setting.put('language', set=arg)
-
-	def camSettings(self, arg):
-		if arg == 'list':
-			return ('1', '2')
-		elif arg == 'setting':
-			if setting.exists('cam'):
-				return setting.get('cam')['set']
-			else:
-				return str(SETCAM + 1)
-		else :
-			setting.put('cam', set=arg)
-	
 	def savefn(self):
 		################ read toggle buttons and translate choice into rating 0-2, note the different order 
 		states = [self.ids.bad, self.ids.meh, self.ids.good]
@@ -195,8 +173,27 @@ class DiltApp(App): # <- Main Class
 		self.Screen.content('meh', state = 'down' if meh else 'normal')
 		self.Screen.content('bad', state = 'down' if bad else 'normal')
 
-	def clearData(self):
-		self.storage.clear()
+	def languageSettings(self, arg):
+		if arg == 'list':
+			return tuple(el['name'] for el in languageSupport())
+		elif arg == 'setting':
+			if setting.exists('language'):
+				return setting.get('language')['set']
+			else:
+				return 'english'
+		else :
+			setting.put('language', set=arg)
+
+	def camSettings(self, arg):
+		if arg == 'list':
+			return ('1', '2')
+		elif arg == 'setting':
+			if setting.exists('cam'):
+				return setting.get('cam')['set']
+			else:
+				return str(SETCAM + 1)
+		else :
+			setting.put('cam', set=arg)
 
 	def on_stop(self):
 		#without this, app will not exit even if the window is closed
