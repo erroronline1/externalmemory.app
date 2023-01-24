@@ -39,11 +39,10 @@ MDScreen:
         id: carousel
         on_slide_complete: libraryLocal.text = app.display_library()
         ScreenLayout:
-			Image:
+			CamImage:
 				id: camImage
 				size_hint: (1, .5)
-				allow_stretch: True
-				keep_ratio: True
+                allow_stretch: True
 			MDTextField:
 				id: productCode
 				hint_text: app.text.get("productCode")
@@ -105,7 +104,7 @@ MDScreen:
                     text: app.text.get("settingCameraLabel")
                 Dropdown:
                     id: settingCameraSelection
-                    text: str(app.platform.selectedCamera)
+                    text: str(camImage.index + 1)
                     on_release: app.settingCameraDropdown["settingCameraSelection"].open()
                 DropdownLabel:
                     id: settingLanguageLabel
@@ -119,8 +118,7 @@ MDScreen:
                 icon: "checkbox-marked-outline"
                 text: app.text.get("settingSaveAndApply")
 				on_release: app.save_setting("cam", settingCameraSelection.text)
-				on_release: app.platform.selectedCamera = int(settingCameraSelection.text)
-				on_release: app.platform.init_capture()
+				on_release: camImage.index = int(settingCameraSelection.text)-1
 				on_release: app.save_setting("lang", settingLanguageSelection.text)
 				on_release: app.translate(settingLanguageSelection.text)
             MDTextField:

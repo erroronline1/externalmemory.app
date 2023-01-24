@@ -37,17 +37,17 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,pillow,kivy==2.1.0,kivymd==1.1.1,pyzbar==0.1.9,opencv==4.7.0
+requirements = python3, pillow, kivy==2.1.0, kivymd==1.1.1, pyzbar==0.1.9, opencv==4.7.0, plyer
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/assets/app_icon.png
+presplash.filename = %(source.dir)s/assets/app_icon.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/assets/app_icon.png
+icon.filename = %(source.dir)s/assets/app_icon.png
 
 # (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
 orientation = portrait
@@ -105,7 +105,7 @@ android.api = 33
 android.minapi = 21
 
 # (int) Android SDK version to use
-#android.sdk = 30
+android.sdk = 30
 
 # (str) Android NDK version to use
 android.ndk = 25b

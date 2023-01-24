@@ -5,17 +5,17 @@ from pathlib import Path
 import os
 import plyer
 
+import numpy
+from PIL import Image
 import cv2
 from pyzbar import pyzbar
 
 class platform_handler():
-	window_size = (450, 800)
+	window_size = (450, 750)
 	app_dir = os.path.dirname(__file__)
 	device = plyer.uniqueid.id
-	imgdestination = None
+	imgframe = None
 	stringdestination = None
-	selectedCamera = 1
-	videocapture = None
 	def __init__(self):
 		if platform=="android":
 			from android.permissions import Permission, request_permissions, check_permission
@@ -32,32 +32,20 @@ class platform_handler():
 			
 			self.window_size = None
 			self.app_dir = app_storage_path()
-
-	def init_capture(self):
-		self.videocapture = cv2.VideoCapture(self.selectedCamera - 1)
-
-	def process_camera_image(self, *args):
-		if not self.videocapture:
-			self.init_capture()
-		ret, frame = self.videocapture.read()
+	
+	def imageProcessing(self, *args):
 		detectedCode = None
-		if ret:
-			barcodes = pyzbar.decode(frame)
+		texture = self.imgframe.texture
+		size = texture.size
+		pixels = texture.pixels
+		pil_image = Image.frombytes(mode='RGBA', size=size, data=pixels)
+		numpypicture = numpy.array(pil_image)
+		if numpypicture.any():
+			barcodes = pyzbar.decode(numpypicture)
 			for barcode in barcodes:
-				x, y , w, h = barcode.rect
-				barcode_info = barcode.data.decode('utf-8')
-				cv2.rectangle(frame, (x, y),(x+w, y+h), (0, 255, 0), 2)
-				############### pass result to label
-				detectedCode = barcode.type + " | " + barcode_info
-			################ convert img to texture
-			buf1 = cv2.flip(frame, 0)
-			buf = buf1.tobytes()
-			image_texture = Texture.create(
-				size = (frame.shape[1], frame.shape[0]), colorfmt='bgr')
-			image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-			################ display image from the texture
-			if self.imgdestination and image_texture:
-				self.imgdestination.texture = image_texture
+				detectedCode = barcode.type + " | " + barcode.data.decode('utf-8')
+			############### pass result to label
 			if self.stringdestination and detectedCode:
 				self.stringdestination.text = detectedCode
 				self.prefill_inputs(detectedCode)
+

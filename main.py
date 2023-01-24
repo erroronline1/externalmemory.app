@@ -17,12 +17,19 @@ from kivy.clock import Clock
 import os
 from datetime import datetime
 
+from kivy.uix.camera import Camera
+
 from language import Language
 from platformhandler import platform_handler
 import database
 
 class IconListItem(OneLineIconListItem):
 	icon = StringProperty()
+
+class CamImage(Camera):
+		resolution=(640, 480)
+		index=0
+		play = True
 
 class ExternalMemoryApp(MDApp): # <- main class
 	dialog = None
@@ -34,8 +41,6 @@ class ExternalMemoryApp(MDApp): # <- main class
 		self.database = database.DataBase(os.path.join( self.platform.app_dir, "ExternalMemory.app.db"))
 		lang = self.database.read(["VALUE"], "SETTING", {"KEY": "lang"})
 		self.text = Language(lang[0][0] if lang else None)
-		cam = self.database.read(["VALUE"], "SETTING", {"KEY": "cam"})
-		self.platform.selectedCamera = int(cam[0][0] if cam else 1)
 		
 		self.screen = Builder.load_file("layout.kv")
 		if self.platform.window_size:
@@ -48,11 +53,13 @@ class ExternalMemoryApp(MDApp): # <- main class
 		self.settingCameraDropdown = self.dropdown_generator(dropdown_options["cameraSetting"])
 		self.settingLanguageDropdown = self.dropdown_generator(dropdown_options["languageSetting"])
 
-		self.platform.imgdestination = self.screen.ids["camImage"]
+		cam = self.database.read(["VALUE"], "SETTING", {"KEY": "cam"})
+		self.screen.ids.camImage.index = int(cam[0][0] if cam else 1) - 1
+		self.platform.imgframe = self.screen.ids["camImage"]
 		self.platform.stringdestination = self.screen.ids["productCode"]
 		self.platform.prefill_inputs = self.prefill_inputs
 
-		Clock.schedule_interval(self.platform.process_camera_image, 1.0 / 10)
+		Clock.schedule_interval(self.platform.imageProcessing, 1.0 / 10)
 		return self.screen
 
 	def dropdown_options(self):
@@ -137,7 +144,7 @@ class ExternalMemoryApp(MDApp): # <- main class
 		for element in self.text.elements:
 			try:
 				# not all language chunks have their respective id'd counterparts like
-				# * dropdown-objects detailratingGood, -Meh and -Bad
+				# * dropdown-objects
 				obj = self.screen.ids[element]
 				if hasattr(obj, "hint_text") and obj.hint_text:
 					obj.hint_text = self.text.elements[element][lang]
