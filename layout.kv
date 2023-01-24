@@ -16,7 +16,8 @@
 	spacing: [10,20]
 
 <DropdownLabel@MDLabel>
-	size_hint: 1, 1
+    size_hint: (1, None)
+    height: dp(24)
 	pos_hint: {'center': (.5, .5)}
 
 <IconListItem>
@@ -25,7 +26,8 @@
         icon: root.icon
 
 <Dropdown@MDDropDownItem>
-	size_hint: 1, 1
+    size_hint: (1, None)
+    height: dp(24)
 	pos_hint: {'center_x': .5, 'center_y': .1}
 
 <Scrollable@MDLabel>
@@ -42,11 +44,18 @@ MDScreen:
 				size_hint: (1, .5)
 				allow_stretch: True
 				keep_ratio: True
-			MDLabel:
+			MDTextField:
 				id: productCode
-				text: app.text.get("productCode")
+				hint_text: app.text.get("productCode")
 				size_hint: (1, None)
-				height: dp(32)
+				height: dp(24)
+                disabled: True
+			MDTextField:
+				id: productRateDate
+				hint_text: app.text.get("productRateDate")
+				size_hint: (1, None)
+				height: dp(24)
+                disabled: True
             MDTextField:
                 id: productNotes
 				multiline: True
@@ -90,7 +99,7 @@ MDScreen:
                 on_release: print(productRating)#pass #save
         ScreenLayout:
             TwoColumns:
-                size_hint: 1 ,.4
+                size_hint: 1, None
                 DropdownLabel:
                     id: settingCameraLabel
                     text: app.text.get("settingCameraLabel")

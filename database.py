@@ -3,7 +3,7 @@ import sqlite3
 
 class DataBase():
 	tableFields = {
-		"DATA": ["ID", "MEMO", "RATING"],
+		"DATA": ["ID", "DATE", "MEMO", "RATING"],
 		"SETTING": ["KEY", "VALUE"]
 	}
 	status = ""
@@ -16,7 +16,8 @@ class DataBase():
 				CREATE TABLE IF NOT EXISTS DATA
 				({self.tableFields["DATA"][0]} TEXT PRIMARY KEY NOT NULL,
 				{self.tableFields["DATA"][1]} TEXT,
-				{self.tableFields["DATA"][2]} INTEGER);''')
+				{self.tableFields["DATA"][2]} TEXT,
+				{self.tableFields["DATA"][3]} INTEGER);''')
 			c.execute(f'''
 				CREATE TABLE IF NOT EXISTS SETTING
 				({self.tableFields["SETTING"][0]} TINYTEXT UNIQUE,

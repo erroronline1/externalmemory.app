@@ -9,7 +9,6 @@ from kivy.properties import StringProperty
 
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import OneLineIconListItem
-from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
@@ -52,8 +51,8 @@ class ExternalMemoryApp(MDApp): # <- main class
 		self.platform.imgdestination = self.screen.ids["camImage"]
 		self.platform.stringdestination = self.screen.ids["productCode"]
 		self.platform.prefill_inputs = self.prefill_inputs
-		Clock.schedule_interval(self.platform.process_camera_image, 1.0 / 60)
 
+		Clock.schedule_interval(self.platform.process_camera_image, 1.0 / 10)
 		return self.screen
 
 	def dropdown_options(self):
@@ -128,7 +127,6 @@ class ExternalMemoryApp(MDApp): # <- main class
 		if btnObj[0].text ==  self.text.get("settingConfirmClearLocal"):
 			self.database.clear(["DATA"])
 			self.screen.ids["libraryLocal"].text = ""
-			#self.notif(self.text.admin("resetMessage"))
 		if btnObj[0].text ==  self.text.get("settingConfirmDeleteCloud"):
 			pass
 			#self.screen.ids["libraryLocal"].text = ""
@@ -181,6 +179,7 @@ class ExternalMemoryApp(MDApp): # <- main class
 		if "|" in productCode and len(productCode[productCode.index("|")+1:]):
 			key_value = {
 				"ID": productCode,
+				"DATE": datetime.now().strftime("%Y-%m-%d"),
 				"MEMO": self.screen.ids["productNotes"].text if self.screen.ids["productNotes"].text else "NULL",
 				"RATING": self.currentRating
 				}
@@ -193,10 +192,13 @@ class ExternalMemoryApp(MDApp): # <- main class
 		known = self.database.read(["*"], "DATA", {"ID": productCode})
 		if not known:
 			self.screen.ids["productNotes"].text = ""
+			self.screen.ids["productRateDate"].text = ""
 			return
-		self.screen.ids["productNotes"].text = known[0][1] if known[0][1] else ""
+		self.screen.ids["productNotes"].text = known[0][2] if known[0][2] else ""
+		self.screen.ids["productRateDate"].text = known[0][1] if known[0][1] else ""
+
 		rating = self.screen.ids["productRating"]
-		segment = rating.ids.segment_panel.children[known[0][2] * 2]
+		segment = rating.ids.segment_panel.children[known[0][3] * 2]
 		if rating.current_active_segment != segment:
 			rating.animation_segment_switch(segment)
 			rating.current_active_segment = segment
@@ -208,7 +210,7 @@ class ExternalMemoryApp(MDApp): # <- main class
 			rating = ["productRatingBad", "productRatingMeh", "productRatingGood"]
 			if library:
 				for item in library:
-					output += f"{item[0]}: {self.text.elements[rating[item[2]]][self.text.selectedLanguage]} - {item[1]}\n\n"
+					output += f"{item[0]}: {item[1]} - {self.text.elements[rating[item[3]]][self.text.selectedLanguage]}\n{item[2]}\n\n"
 			return output
 		
 

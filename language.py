@@ -8,6 +8,10 @@ class Language():
 			"english": "detected code",
 			"deutsch": "erkannter Code",
 		},
+		"productRateDate": {
+			"english": "last rated on",
+			"deutsch": "zuletzt bewertet am",
+		},
 		"productNotes": {
 			"english": "my notes",
 			"deutsch": "meine Notizen",
