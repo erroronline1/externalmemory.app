@@ -1,0 +1,131 @@
+<ScreenLayout@MDBoxLayout>
+	size_hint: 1, 1
+	pos_hint: {'center': (.5, .5)}
+	orientation: "vertical"
+	padding: 20
+	spacing: 10
+
+<MDFillRoundFlatIconButton>
+	size_hint: 1, None
+
+<TwoColumns@MDGridLayout>
+	size_hint: 1, None
+	height: self.minimum_height
+	pos_hint: {'center': (.5, .5)}
+	cols: 2
+	spacing: [10,20]
+
+<DropdownLabel@MDLabel>
+	size_hint: 1, 1
+	pos_hint: {'center': (.5, .5)}
+
+<IconListItem>
+    IconLeftWidget:
+		pos_hint: {'center_x': .5, 'center_y': .5}
+        icon: root.icon
+
+<Dropdown@MDDropDownItem>
+	size_hint: 1, 1
+	pos_hint: {'center_x': .5, 'center_y': .1}
+
+<Scrollable@MDLabel>
+    size_hint_y: None
+    height: self.texture_size[1]
+
+MDScreen:
+    MDCarousel:
+        id: carousel
+        on_slide_complete: libraryLocal.text = app.display_library()
+        ScreenLayout:
+			Image:
+				id: camImage
+				size_hint: (1, .5)
+				allow_stretch: True
+				keep_ratio: True
+			MDLabel:
+				id: productCode
+				text: app.text.get("productCode")
+				size_hint: (1, None)
+				height: dp(32)
+            MDTextField:
+                id: productNotes
+				multiline: True
+				size_hint: (1, .5)
+                hint_text: app.text.get("productNotes")
+            MDSegmentedControl:
+                adaptive_width: True
+                id: productRating
+                pos_hint: {"center_x": .5, "center_y": .5}
+                on_active: app.set_current_rating(*args)
+                MDSegmentedControlItem:
+                    id: productRatingGood
+                    text: app.text.get("productRatingGood")
+                MDSegmentedControlItem:
+                    id: productRatingMeh
+                    text: app.text.get("productRatingMeh")
+                MDSegmentedControlItem:
+                    id: productRatingBad
+                    text: app.text.get("productRatingBad")
+            MDFillRoundFlatIconButton:
+                id: productSave
+                icon: "content-save-outline"
+                text: app.text.get("productSave")
+                disabled: not bool("|" in productCode.text and len(productCode.text[productCode.text.index("|")+1:]))
+                on_release: app.save_inputs()
+        ScreenLayout:
+            MDScrollView:
+                Scrollable:
+                    id: libraryLocal
+                    text: app.display_library()
+            MDFillRoundFlatIconButton:
+                id: libraryClearLocal
+                icon: "trash-can-outline"
+                text: app.text.get("libraryClearLocal")
+				on_release: app.cancel_confirm_dialog(app.text.get("libraryClearLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmClearLocal"))
+            MDFillRoundFlatIconButton:
+                id: librarySynchronizeCloud
+                icon: "cloud-sync-outline"
+                text: app.text.get("librarySynchronizeCloud")
+                disabled: True
+                on_release: print(productRating)#pass #save
+        ScreenLayout:
+            TwoColumns:
+                size_hint: 1 ,.4
+                DropdownLabel:
+                    id: settingCameraLabel
+                    text: app.text.get("settingCameraLabel")
+                Dropdown:
+                    id: settingCameraSelection
+                    text: str(app.platform.selectedCamera)
+                    on_release: app.settingCameraDropdown["settingCameraSelection"].open()
+                DropdownLabel:
+                    id: settingLanguageLabel
+                    text: app.text.get("settingLanguageLabel")
+                Dropdown:
+                    id: settingLanguageSelection
+                    text: app.text.selectedLanguage
+                    on_release: app.settingLanguageDropdown["settingLanguageSelection"].open()
+            MDFillRoundFlatIconButton:
+                id: settingSaveAndApply
+                icon: "checkbox-marked-outline"
+                text: app.text.get("settingSaveAndApply")
+				on_release: app.save_setting("cam", settingCameraSelection.text)
+				on_release: app.platform.selectedCamera = int(settingCameraSelection.text)
+				on_release: app.platform.init_capture()
+				on_release: app.save_setting("lang", settingLanguageSelection.text)
+				on_release: app.translate(settingLanguageSelection.text)
+            MDTextField:
+                id: settingDevice
+                text: app.platform.device
+                hint_text: app.text.get("settingDevice")
+                disabled: True
+            MDFillRoundFlatIconButton:
+                id: settingDeleteCloud
+                icon: "cloud-off-outline"
+                text: app.text.get("settingDeleteCloud")
+                disabled: True
+				on_release: app.cancel_confirm_dialog(app.text.get("settingDeleteCloudConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmDeleteCloud"))
+            MDScrollView:
+                Scrollable:
+                    id: settingInfo
+                    text: app.text.get("settingInfo")

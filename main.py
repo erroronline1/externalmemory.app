@@ -1,203 +1,216 @@
-from kivy.app import App
+# -*- coding: utf-8 -*-
+__version__ = "1.0"
+
+from kivymd.app import MDApp
+from kivy.lang import Builder
+from kivy.metrics import dp
+from kivy.core.window import Window
+from kivy.properties import StringProperty
+
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.list import OneLineIconListItem
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
 from kivy.clock import Clock
-from kivy.graphics.texture import Texture
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.popup import Popup
-from kivy.properties import ObjectProperty, StringProperty
-from kivy.storage.jsonstore import JsonStore # in hope kivy handles the respective permissions for storage access after compiling
-import json
-import cv2
-from pyzbar import pyzbar
 
-from diltlang import languageSupport, language
+import os
+from datetime import datetime
 
-'''
-todo
+from language import Language
+from platformhandler import platform_handler
+import database
 
-barcode api for product information
-styling
-some uid
-server api
+class IconListItem(OneLineIconListItem):
+	icon = StringProperty()
 
+class ExternalMemoryApp(MDApp): # <- main class
+	dialog = None
+	currentRating = 2
 
-'''
-
-setting = JsonStore('diltsettings.json')
-SETLANG = 'en'
-if setting.exists('language'):
-	for el in languageSupport():
-		if el['name'] == setting.get('language')['set']:
-			SETLANG = el['abbrev']
-			break
-SETCAM = int(setting.get('cam')['set']) - 1 if setting.exists('cam') else 0
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.platform = platform_handler()
+		self.database = database.DataBase(os.path.join( self.platform.app_dir, "ExternalMemory.app.db"))
+		lang = self.database.read(["VALUE"], "SETTING", {"KEY": "lang"})
+		self.text = Language(lang[0][0] if lang else None)
+		cam = self.database.read(["VALUE"], "SETTING", {"KEY": "cam"})
+		self.platform.selectedCamera = int(cam[0][0] if cam else 1)
+		
+		self.screen = Builder.load_file("layout.kv")
+		if self.platform.window_size:
+			Window.size = self.platform.window_size
 
 
-class Screen(BoxLayout):
-	camimage = ObjectProperty(None)
-	detectedcode = ObjectProperty(None)
-	mynotes = ObjectProperty(None)
-	good = ObjectProperty(None)
-	meh = ObjectProperty(None)
-	bad = ObjectProperty(None)
+	def build(self):
+		#self.icon = r'assets/app_icon.png'
+		dropdown_options = self.dropdown_options()
+		self.settingCameraDropdown = self.dropdown_generator(dropdown_options["cameraSetting"])
+		self.settingLanguageDropdown = self.dropdown_generator(dropdown_options["languageSetting"])
 
-	mydata = ObjectProperty(None)
+		self.platform.imgdestination = self.screen.ids["camImage"]
+		self.platform.stringdestination = self.screen.ids["productCode"]
+		self.platform.prefill_inputs = self.prefill_inputs
+		Clock.schedule_interval(self.platform.process_camera_image, 1.0 / 60)
 
-	def content(self, element, **kwargs):
-		# update content during runtime if kwargs are provided
-		if len(kwargs):
-			for arg in kwargs:
-				# conditional property check because dynamic assignment throws an unsubscriptable type error
-				if arg == 'text':
-					self.ids[element].text = kwargs[arg]
-				elif arg == 'texture':
-					self.ids[element].texture = kwargs[arg]
-				elif arg == 'state':
-					self.ids[element].state = kwargs[arg]
-				
-				# custom property handlings
-				elif arg == 'mydata':
-					text = self.content('mydataDefault')
-					if DiltApp.storage:
-						currentstorage={}
-						for key in DiltApp.storage:
-							currentstorage[key] = DiltApp.storage[key]
-						text = json.dumps(currentstorage, indent=4)
-					self.ids['mydata'].text = text # update after storing
-					return text # default return for initializing app
+		return self.screen
 
+	def dropdown_options(self):
+		return {
+			"cameraSetting":{
+				"options": [{"icon": "camera-outline", "option": str(cam + 1)} for cam in range(2)],
+				"fields": ["settingCameraSelection"],
+				"context": "settingCameraDropdown"
+			},
+			"languageSetting":{
+				"options": [{"icon": "translate", "option": lang} for lang in self.text.available()],
+				"fields": ["settingLanguageSelection"],
+				"context": "settingLanguageDropdown"
+			},
+		}
+
+	def dropdown_generator(self, parameter):
+		items = [
+			{
+				"text": self.text.get(i["content"]) if "content" in i else i["option"],
+				"content": i.get("content"),
+				"height": dp(64),
+				"viewclass": "IconListItem" if "icon" in i else None,
+				"icon": i.get("icon")
+			} for i in parameter["options"]
+		]
+		return {
+			field: MDDropdownMenu(
+					caller = self.screen.ids[field],
+					items = [dict(i,
+						**{"on_release": lambda x = (field, i["text"], parameter["context"]): self.select_dropdown_item(x[0], x[1], x[2])}
+						) for i in items],
+					position = "center",
+					width_mult = 4
+			) for field in parameter["fields"]
+		}
+
+	def select_dropdown_item(self, field, text, context):
+		self.screen.ids[field].text = text
+		con_text = getattr(self, context)
+		con_text[field].dismiss()
+
+	def notif(self, msg, display_delayed = 0):
+		def sb(this):
+			Snackbar(
+				text = msg,
+				snackbar_x = self.layout["left"],
+				snackbar_y = self.layout["bottom"],
+				size_hint_x = (Window.width - self.layout["left"] - self.layout["right"]) / Window.width,
+			).open()
+		Clock.schedule_once(sb, display_delayed)
+
+	def cancel_confirm_dialog(self, decision, cancel, confirm):
+		if not self.dialog:
+			self.dialog = MDDialog(
+				text = decision,
+				buttons = [
+					MDFlatButton(
+						text = cancel,
+						on_release = self.cancel_confirm_dialog_handler
+					),
+					MDFlatButton(
+						text = confirm,
+						on_release = self.cancel_confirm_dialog_handler
+					),
+				],
+			)
+		self.dialog.open()
+
+	def cancel_confirm_dialog_handler(self, *btnObj):
+		self.dialog.dismiss()
+		if btnObj[0].text ==  self.text.get("settingConfirmClearLocal"):
+			self.database.clear(["DATA"])
+			self.screen.ids["libraryLocal"].text = ""
+			#self.notif(self.text.admin("resetMessage"))
+		if btnObj[0].text ==  self.text.get("settingConfirmDeleteCloud"):
+			pass
+			#self.screen.ids["libraryLocal"].text = ""
+			#self.notif(self.text.admin("resetMessage"))
+
+	def translate(self, lang):
+		self.text.selectedLanguage = lang
+		for element in self.text.elements:
+			try:
+				# not all language chunks have their respective id'd counterparts like
+				# * dropdown-objects detailratingGood, -Meh and -Bad
+				obj = self.screen.ids[element]
+				if hasattr(obj, "hint_text") and obj.hint_text:
+					obj.hint_text = self.text.elements[element][lang]
+					continue
+				elif hasattr(obj, "text") and obj.text:
+					obj.text = self.text.elements[element][lang]
+			except:
+				continue
+
+	def save_setting(self, key, value):
+		sanitize={
+			"default": lambda x: int(x),
+			"lang": lambda x: x.strip(),
+		}
+		try:
+			if key in sanitize:
+				value=sanitize[key](value)
+			else:
+				value=sanitize["default"](value)
+		except Exception as e:
+			value=""
+		if value in ("", "NULL"):
+			self.database.delete("SETTING", {"KEY": key})
+		else:
+			self.database.write("SETTING", {"KEY": key, "VALUE": value}, {"KEY": key})
+		return str(value)
+
+	def set_current_rating(self, *args) -> None:
+		rating = None
+		selected = args[1].text
+		for i, option in enumerate(["productRatingBad", "productRatingMeh", "productRatingGood"]):
+			if selected == self.text.elements[option][self.text.selectedLanguage]:
+				rating = i
+				break
+		self.currentRating = (rating)
+
+	def save_inputs(self):
+		productCode = self.screen.ids["productCode"].text
+		if "|" in productCode and len(productCode[productCode.index("|")+1:]):
+			key_value = {
+				"ID": productCode,
+				"MEMO": self.screen.ids["productNotes"].text if self.screen.ids["productNotes"].text else "NULL",
+				"RATING": self.currentRating
+				}
+			self.session = self.database.write("DATA", key_value, {"ID": productCode})
+		else:
+			self.notif(self.text.get("missingRateNotif"))
+
+	def prefill_inputs(self, productCode):
+		# this is to be passed to the platformhandler and executed if something like a code is recognized
+		known = self.database.read(["*"], "DATA", {"ID": productCode})
+		if not known:
+			self.screen.ids["productNotes"].text = ""
 			return
-		# else return default language chunks
-		return language(element, SETLANG)
-	
-	def savefn(self):
-		################ read toggle buttons and translate choice into rating 0-2, note the different order 
-		states = [self.ids.bad, self.ids.meh, self.ids.good]
-		rating = False
-		for el in states:        
-			if el.state == "down":
-				rating = states.index(el)
-		################ create rating summary
-		DiltApp.save(DiltApp, {
-			"code": self.ids.detectedcode.text,
-			"note": self.ids.mynotes.text,
-			"rating": rating
-		})
-		self.content('mydata', mydata=True)
+		self.screen.ids["productNotes"].text = known[0][1] if known[0][1] else ""
+		rating = self.screen.ids["productRating"]
+		segment = rating.ids.segment_panel.children[known[0][2] * 2]
+		if rating.current_active_segment != segment:
+			rating.animation_segment_switch(segment)
+			rating.current_active_segment = segment
+			rating.dispatch("on_active", segment)
 
-	def clearData(self):
-		def execute():
-			DiltApp.storage.clear()
-			self.content('mydata', mydata=True)
-		popup=ConfirmPopup()
-		popup.init(label=language("mydataClearConfirm", SETLANG), execute=execute)
-		popup.open()
-
-
-class ConfirmPopup(Popup):
-	text = StringProperty('')
-	ok_text = StringProperty(language("generalOK", SETLANG))
-	cancel_text = StringProperty(language("generalCancel", SETLANG))
-	__events__ = ('on_ok', 'on_cancel')
-	def init(self, **kwargs):
-		self.text=kwargs['label'] # decision
-		self.execute=kwargs['execute'] # passed function on case of confirmation
-	def build(self):
-		self.Popup = Popup()
-		return self.Popup
-	def ok(self):
-		self.dispatch('on_ok')
-		self.dismiss()
-	def cancel(self):
-		self.dispatch('on_cancel')
-		self.dismiss()
-	def on_ok(self):
-		self.execute()
-		pass
-	def on_cancel(self):
-		pass
-
-
-class DiltApp(App): # <- Main Class
-	storage = JsonStore('diltstorage.json')
-
-	def build(self):
-		self.capture = cv2.VideoCapture(SETCAM)
-		Clock.schedule_interval(self.camupdate, 1.0 / 60)
-		self.Screen = Screen()
-		return self.Screen
-
-	def camupdate(self, dt):
-		ret, frame = self.capture.read()
-		if ret:
-			frame = self.read_barcodes(frame)
-			################ convert it to texture
-			buf1 = cv2.flip(frame, 0)
-			buf = buf1.tostring()
-			image_texture = Texture.create(
-				size = (frame.shape[1], frame.shape[0]), colorfmt='bgr')
-			image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-			################ display image from the texture
-			self.Screen.content('camimage', texture = image_texture)
-
-	def read_barcodes(self, frame):
-		barcodes = pyzbar.decode(frame)
-		for barcode in barcodes:
-			x, y , w, h = barcode.rect
-			barcode_info = barcode.data.decode('utf-8')
-			cv2.rectangle(frame, (x, y),(x+w, y+h), (0, 255, 0), 2)
-			############### pass result to label
-			detected = barcode.type + " | " + barcode_info
-			self.lookup(detected)
-			self.Screen.content('detectedcode', text=detected)
-		return frame
-
-	def save(self, values):
-		self.storage.put(values['code'], memo=values['note'], rating=values['rating'])
-
-	def lookup(self, code):
-		mynotes = ''
-		good = False
-		meh = False
-		bad = False
-		if self.storage.exists(code):
-			mynotes = self.storage.get(code)['memo']
-			if self.storage.get(code)['rating'] == 2:
-				good = True
-			if self.storage.get(code)['rating'] == 1:
-				meh = True
-			if self.storage.get(code)['rating'] == 0:
-				bad = True
-
-		self.Screen.content('mynotes', text = mynotes)
-		self.Screen.content('good', state = 'down' if good else 'normal')
-		self.Screen.content('meh', state = 'down' if meh else 'normal')
-		self.Screen.content('bad', state = 'down' if bad else 'normal')
-
-	def languageSettings(self, arg):
-		if arg == 'list':
-			return tuple(el['name'] for el in languageSupport())
-		elif arg == 'setting':
-			if setting.exists('language'):
-				return setting.get('language')['set']
-			else:
-				return 'english'
-		else :
-			setting.put('language', set=arg)
-
-	def camSettings(self, arg):
-		if arg == 'list':
-			return ('1', '2')
-		elif arg == 'setting':
-			if setting.exists('cam'):
-				return setting.get('cam')['set']
-			else:
-				return str(SETCAM + 1)
-		else :
-			setting.put('cam', set=arg)
-
-	def on_stop(self):
-		#without this, app will not exit even if the window is closed
-		self.capture.release()
+	def display_library(self):
+			library = self.database.read(["*"], "DATA")
+			output = "\n"
+			rating = ["productRatingBad", "productRatingMeh", "productRatingGood"]
+			if library:
+				for item in library:
+					output += f"{item[0]}: {self.text.elements[rating[item[2]]][self.text.selectedLanguage]} - {item[1]}\n\n"
+			return output
+		
 
 if __name__ == "__main__":
-	DiltApp().run()
+	ExternalMemoryApp().run()
