@@ -39,10 +39,21 @@ MDScreen:
         id: carousel
         on_slide_complete: libraryLocal.text = app.display_library()
         ScreenLayout:
-			CamImage:
-				id: camImage
-				size_hint: (1, .5)
-                allow_stretch: True
+            MDBoxLayout:
+                size_hint: (1, .5)
+                padding: dp(0)
+                CamImage:
+                    id: camImage
+                    angle: 0
+                    index: 0
+                    play: True
+                    canvas.before:
+                        PushMatrix
+                        Rotate:
+                            angle: self.angle
+                            origin: self.center
+                    canvas.after:
+                        PopMatrix
 			MDTextField:
 				id: productCode
 				hint_text: app.text.get("productCode")

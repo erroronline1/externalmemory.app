@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from kivy import platform
-from kivy.graphics.texture import Texture
-from pathlib import Path
+from kivy.metrics import dp
 import os
 import plyer
 
 import numpy
 from PIL import Image
-import cv2
 from pyzbar import pyzbar
 
 class platform_handler():
@@ -49,3 +47,8 @@ class platform_handler():
 				self.stringdestination.text = detectedCode
 				self.prefill_inputs(detectedCode)
 
+	def adjustCamera(self):
+		if platform != "android":
+			return
+		self.imgframe.angle = -90
+		self.imgframe.parent.padding = dp(20)

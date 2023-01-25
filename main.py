@@ -13,11 +13,10 @@ from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivy.clock import Clock
+from kivy.uix.camera import Camera
 
 import os
 from datetime import datetime
-
-from kivy.uix.camera import Camera
 
 from language import Language
 from platformhandler import platform_handler
@@ -27,9 +26,7 @@ class IconListItem(OneLineIconListItem):
 	icon = StringProperty()
 
 class CamImage(Camera):
-		resolution=(640, 480)
-		index=0
-		play = True
+	pass
 
 class ExternalMemoryApp(MDApp): # <- main class
 	dialog = None
@@ -46,7 +43,6 @@ class ExternalMemoryApp(MDApp): # <- main class
 		if self.platform.window_size:
 			Window.size = self.platform.window_size
 
-
 	def build(self):
 		#self.icon = r'assets/app_icon.png'
 		dropdown_options = self.dropdown_options()
@@ -58,6 +54,7 @@ class ExternalMemoryApp(MDApp): # <- main class
 		self.platform.imgframe = self.screen.ids["camImage"]
 		self.platform.stringdestination = self.screen.ids["productCode"]
 		self.platform.prefill_inputs = self.prefill_inputs
+		self.platform.adjustCamera()
 
 		Clock.schedule_interval(self.platform.imageProcessing, 1.0 / 10)
 		return self.screen
