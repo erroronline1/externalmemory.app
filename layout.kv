@@ -73,18 +73,25 @@ MDScreen:
                 hint_text: app.text.get("productNotes")
             MDSegmentedControl:
                 adaptive_width: True
+                size_hint: 1, None
                 id: productRating
                 pos_hint: {"center_x": .5, "center_y": .5}
                 on_active: app.set_current_rating(*args)
                 MDSegmentedControlItem:
                     id: productRatingGood
                     text: app.text.get("productRatingGood")
+                    size_hint: .3, 1
+                    size_hint_max_x: dp(110)
                 MDSegmentedControlItem:
                     id: productRatingMeh
                     text: app.text.get("productRatingMeh")
+                    size_hint: .3, 1
+                    size_hint_max_x: dp(110)
                 MDSegmentedControlItem:
                     id: productRatingBad
                     text: app.text.get("productRatingBad")
+                    size_hint: .3, 1
+                    size_hint_max_x: dp(110)
             MDFillRoundFlatIconButton:
                 id: productSave
                 icon: "content-save-outline"
@@ -96,27 +103,9 @@ MDScreen:
                 Scrollable:
                     id: libraryLocal
                     text: app.display_library()
-            MDFillRoundFlatIconButton:
-                id: libraryClearLocal
-                icon: "trash-can-outline"
-                text: app.text.get("libraryClearLocal")
-				on_release: app.cancel_confirm_dialog(app.text.get("libraryClearLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmClearLocal"))
-            MDFillRoundFlatIconButton:
-                id: librarySynchronizeCloud
-                icon: "cloud-sync-outline"
-                text: app.text.get("librarySynchronizeCloud")
-                disabled: True
-                on_release: print(productRating)#pass #save
         ScreenLayout:
             TwoColumns:
                 size_hint: 1, None
-                DropdownLabel:
-                    id: settingCameraLabel
-                    text: app.text.get("settingCameraLabel")
-                Dropdown:
-                    id: settingCameraSelection
-                    text: str(camImage.index + 1)
-                    on_release: app.settingCameraDropdown["settingCameraSelection"].open()
                 DropdownLabel:
                     id: settingLanguageLabel
                     text: app.text.get("settingLanguageLabel")
@@ -124,26 +113,30 @@ MDScreen:
                     id: settingLanguageSelection
                     text: app.text.selectedLanguage
                     on_release: app.settingLanguageDropdown["settingLanguageSelection"].open()
+					on_text: app.translate(settingLanguageSelection.text)
+    				on_text: app.save_setting("lang", settingLanguageSelection.text)
             MDFillRoundFlatIconButton:
-                id: settingSaveAndApply
-                icon: "checkbox-marked-outline"
-                text: app.text.get("settingSaveAndApply")
-				on_release: app.save_setting("cam", settingCameraSelection.text)
-				on_release: camImage.index = int(settingCameraSelection.text)-1
-				on_release: app.save_setting("lang", settingLanguageSelection.text)
-				on_release: app.translate(settingLanguageSelection.text)
-            MDTextField:
-                id: settingDevice
-                text: app.platform.device
-                hint_text: app.text.get("settingDevice")
-                disabled: True
+                id: settingClearLocal
+                icon: "trash-can-outline"
+                text: app.text.get("settingClearLocal")
+				on_release: app.cancel_confirm_dialog(app.text.get("settingClearLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmClearLocal"))
             MDFillRoundFlatIconButton:
-                id: settingDeleteCloud
-                icon: "cloud-off-outline"
-                text: app.text.get("settingDeleteCloud")
-                disabled: True
-				on_release: app.cancel_confirm_dialog(app.text.get("settingDeleteCloudConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmDeleteCloud"))
+                id: settingExportLocal
+                icon: "database-export-outline"
+                text: app.text.get("settingExportLocal")
+				on_release: app.cancel_confirm_dialog(app.text.get("settingExportLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmExportLocal"))
+            MDFillRoundFlatIconButton:
+                id: settingImportLocal
+                icon: "database-import-outline"
+                text: app.text.get("settingImportLocal")
+				on_release: app.cancel_confirm_dialog(app.text.get("settingImportLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmImportLocal"))
             MDScrollView:
                 Scrollable:
                     id: settingInfo
                     text: app.text.get("settingInfo")
+            MDRectangleFlatIconButton:
+                center_x: .5
+                text: "github.com/erroronline1/externalmemory.app"
+                icon: "github"
+                line_color: (0, 0, 0, 0)
+                on_release: app.weblink("https://github.com/erroronline1/externalmemory.app")

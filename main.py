@@ -16,6 +16,7 @@ from kivy.clock import Clock
 from kivy.uix.camera import Camera
 
 import os
+import webbrowser
 from datetime import datetime
 
 from language import Language
@@ -31,11 +32,11 @@ class CamImage(Camera):
 class ExternalMemoryApp(MDApp): # <- main class
 	dialog = None
 	currentRating = 2
-
+	dbname = "ExternalMemory.app.db"
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.platform = platform_handler()
-		self.database = database.DataBase(os.path.join( self.platform.app_dir, "ExternalMemory.app.db"))
+		self.database = database.DataBase(os.path.join( self.platform.app_dir, self.dbname))
 		lang = self.database.read(["VALUE"], "SETTING", {"KEY": "lang"})
 		self.text = Language(lang[0][0] if lang else None)
 		
@@ -44,13 +45,11 @@ class ExternalMemoryApp(MDApp): # <- main class
 			Window.size = self.platform.window_size
 
 	def build(self):
-		#self.icon = r'assets/app_icon.png'
+		#self.theme_cls.theme_style = "Dark"
+		self.icon = r'assets/app_icon.png'
 		dropdown_options = self.dropdown_options()
-		self.settingCameraDropdown = self.dropdown_generator(dropdown_options["cameraSetting"])
 		self.settingLanguageDropdown = self.dropdown_generator(dropdown_options["languageSetting"])
 
-		cam = self.database.read(["VALUE"], "SETTING", {"KEY": "cam"})
-		self.screen.ids.camImage.index = int(cam[0][0] if cam else 1) - 1
 		self.platform.imgframe = self.screen.ids["camImage"]
 		self.platform.stringdestination = self.screen.ids["productCode"]
 		self.platform.prefill_inputs = self.prefill_inputs
@@ -61,11 +60,6 @@ class ExternalMemoryApp(MDApp): # <- main class
 
 	def dropdown_options(self):
 		return {
-			"cameraSetting":{
-				"options": [{"icon": "camera-outline", "option": str(cam + 1)} for cam in range(2)],
-				"fields": ["settingCameraSelection"],
-				"context": "settingCameraDropdown"
-			},
 			"languageSetting":{
 				"options": [{"icon": "translate", "option": lang} for lang in self.text.available()],
 				"fields": ["settingLanguageSelection"],
@@ -102,10 +96,7 @@ class ExternalMemoryApp(MDApp): # <- main class
 	def notif(self, msg, display_delayed = 0):
 		def sb(this):
 			Snackbar(
-				text = msg,
-				snackbar_x = self.layout["left"],
-				snackbar_y = self.layout["bottom"],
-				size_hint_x = (Window.width - self.layout["left"] - self.layout["right"]) / Window.width,
+				text = msg
 			).open()
 		Clock.schedule_once(sb, display_delayed)
 
@@ -128,13 +119,18 @@ class ExternalMemoryApp(MDApp): # <- main class
 
 	def cancel_confirm_dialog_handler(self, *btnObj):
 		self.dialog.dismiss()
+		self.dialog = None
 		if btnObj[0].text ==  self.text.get("settingConfirmClearLocal"):
 			self.database.clear(["DATA"])
 			self.screen.ids["libraryLocal"].text = ""
-		if btnObj[0].text ==  self.text.get("settingConfirmDeleteCloud"):
-			pass
-			#self.screen.ids["libraryLocal"].text = ""
-			#self.notif(self.text.admin("resetMessage"))
+		if btnObj[0].text ==  self.text.get("settingConfirmExportLocal"):
+			success = self.platform.file.copy_to_shared(
+				os.path.join(self.platform.app_dir, self.dbname),
+				collection = None,
+				filepath = self.platform.export_path(self.dbname))
+			self.notif(f"{success}")
+		if btnObj[0].text ==  self.text.get("settingConfirmImportLocal"):
+			self.platform.chooser.choose_content('*/*')
 
 	def translate(self, lang):
 		self.text.selectedLanguage = lang
@@ -216,7 +212,9 @@ class ExternalMemoryApp(MDApp): # <- main class
 				for item in library:
 					output += f"{item[0]}: {item[1]} - {self.text.elements[rating[item[3]]][self.text.selectedLanguage]}\n{item[2]}\n\n"
 			return output
-		
+	
+	def weblink(self, url):
+		webbrowser.open(url)
 
 if __name__ == "__main__":
 	ExternalMemoryApp().run()
