@@ -44,6 +44,13 @@ class ExternalMemoryApp(MDApp): # <- main class
 		if self.platform.window_size:
 			Window.size = self.platform.window_size
 
+	def on_pause(self):
+		self.screen.ids["camImage"].play = False
+		return True
+	def on_resume(self):
+		self.screen.ids["camImage"].play = True
+		return True
+
 	def build(self):
 		#self.theme_cls.theme_style = "Dark"
 		self.icon = r'assets/app_icon.png'
