@@ -8,6 +8,10 @@ class Language():
 			"english": "detected code",
 			"deutsch": "erkannter Code",
 		},
+		"productLookup": {
+			"english": "lookup with ecosia",
+			"deutsch": "mit Ecosia suchen",
+		},
 		"productRateDate": {
 			"english": "last rated on",
 			"deutsch": "zuletzt bewertet am",
@@ -31,6 +35,11 @@ class Language():
 		"productSave": {
 			"english": "save product",
 			"deutsch": "Produkt speichern",
+		},
+
+		"libraryTitle": {
+			"english": "Your Library",
+			"deutsch": "Deine Bibliothek",
 		},
 
 		"settingLanguageLabel": {

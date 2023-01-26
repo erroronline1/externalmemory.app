@@ -33,6 +33,17 @@
 <Scrollable@MDLabel>
     size_hint_y: None
     height: self.texture_size[1]
+    color: app.theme_cls.opposite_bg_darkest
+
+<MDLabel>
+    color: app.theme_cls.primary_color
+
+<MDTextfield>
+    foreground_color: app.theme_cls.opposite_bg_darkest
+    disabled_foreground_color: app.theme_cls.primary_color
+
+<MDSegmentedControlItem>
+    color: app.theme_cls.primary_color
 
 MDScreen:
     MDCarousel:
@@ -60,6 +71,12 @@ MDScreen:
 				size_hint: (1, None)
 				height: dp(24)
                 disabled: True
+            MDFillRoundFlatIconButton:
+                id: productLookup
+                icon: "search-web"
+                text: app.text.get("productLookup")
+                disabled: not bool("|" in productCode.text and len(productCode.text[productCode.text.index("|")+1:]))
+                on_release: app.weblink("https://www.ecosia.org/search?q=" + productCode.text.replace("|",""))
 			MDTextField:
 				id: productRateDate
 				hint_text: app.text.get("productRateDate")
@@ -99,6 +116,11 @@ MDScreen:
                 disabled: not bool("|" in productCode.text and len(productCode.text[productCode.text.index("|")+1:]))
                 on_release: app.save_inputs()
         ScreenLayout:
+            MDLabel:
+                id: libraryTitle
+                text: app.text.get("libraryTitle")
+                size_hint: (1, None)
+				height: dp(24)
             MDScrollView:
                 Scrollable:
                     id: libraryLocal
