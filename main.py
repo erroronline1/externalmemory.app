@@ -52,7 +52,7 @@ class ExternalMemoryApp(MDApp): # <- main class
 		return True
 
 	def build(self):
-		#self.theme_cls.theme_style = "Dark"
+		self.theme_cls.theme_style = "Dark"
 		self.icon = r'assets/app_icon.png'
 		dropdown_options = self.dropdown_options()
 		self.settingLanguageDropdown = self.dropdown_generator(dropdown_options["languageSetting"])
