@@ -23,6 +23,8 @@ from language import Language
 from platformhandler import platform_handler
 import database
 
+os.environ["KIVY_ORIENTATION"] = "Portrait"
+
 class IconListItem(OneLineIconListItem):
 	icon = StringProperty()
 
