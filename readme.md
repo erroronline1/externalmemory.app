@@ -9,8 +9,10 @@ i had high hopes of publishing the app at the playstore and earning a little bit
 
 so if this idea goes viral without me participating in the earnings anyway: fuck you.
 
-## [download a working apk from google drive](https://drive.google.com/file/d/1svrL37KDWVGNOJ2tptWggJMTWBPef0o_/view?usp=share_link)
-(because tracking changes in this binary is a stupid idea). 
+## download a working apk
+<a href="https://drive.google.com/file/d/1svrL37KDWVGNOJ2tptWggJMTWBPef0o_/view?usp=share_link" target="_blank">>>> link to google drive <<<</a>
+
+(because tracking changes in this binary is a stupid idea)
 
 ## features
 * easy to use, open usecases
@@ -24,7 +26,7 @@ so if this idea goes viral without me participating in the earnings anyway: fuck
 
 ## known flaws
 * this app is far from perfect. i am just glad it essentially works and can be used as intended. 
-* [see issues](/issues)
+* [see issues](https://github.com/erroronline1/externalmemory.app/issues)
 
 ## <s>five simple steps</s> to create an app
 <details>
