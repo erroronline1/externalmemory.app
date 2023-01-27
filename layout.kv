@@ -49,6 +49,7 @@ MDScreen:
     MDCarousel:
         id: carousel
         on_slide_complete: libraryLocal.text = app.display_library()
+        on_slide_complete: camImage.play = self.slides.index(self.current_slide) == 0
         ScreenLayout:
             MDBoxLayout:
                 size_hint: (1, .5)
