@@ -9,26 +9,28 @@ i had high hopes of publishing the app at the playstore and earning a little bit
 
 so if this idea goes viral without me participating in the earnings anyway: fuck you.
 
+## [download a working apk from google drive](https://drive.google.com/file/d/1svrL37KDWVGNOJ2tptWggJMTWBPef0o_/view?usp=share_link)
+(because tracking changes in this binary is a stupid idea). 
+
 ## features
 * easy to use, open usecases
 * stricly local
 * no privacy issues
 * export and restore database to and from shared storage
 * good for your wallet and the environment
-* kepps you from repetitive disappointments
+* keeps you from repetitive disappointments (at least some in your life)
 
 ![three screens](/images/screenshots.png)
 
 ## known flaws
+* this app is far from perfect. i am just glad it essentially works and can be used as intended. 
+* [see issues](/issues)
 
-* the canvas for the kivy camera has to be rotated for portrait use. but i didn't manage to crop it to a square, so it remains quite small on mobile.
-* MDSegmentedControl and MDSegmentedControlItem either seem to be a bit buggy or need further digging into the source code to fix the width of the selector indicator and its remaining shadow across the next accordeon screen
-* selected file for reimport of database is not verified for lazy reasons. if you select anything else but the exported database file your inaccessible app directory gets bloated.
-
+## <s>five simple steps</s> to create an app
 <details>
-<summary><strike>five simple steps</strike> to create an app</summary>
+<summary>you don't really want to read this</summary>
 
-i imagine for most of you this is easy-peasy but trying to create this android app was a hell of a ride.
+i imagine for some of you this is easy-peasy but trying to create this android app was a hell of a ride.
 
 i don't know java and am still not willing to learn it. instead i wanted to rely an things i know. **boy, have i been naive!**
 
