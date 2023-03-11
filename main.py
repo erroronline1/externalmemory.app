@@ -12,6 +12,9 @@ from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
+from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.label import MDLabel
+from kivymd.uix.button import MDIconButton
 from kivy.clock import Clock
 from kivy.uix.camera import Camera
 
@@ -214,14 +217,43 @@ class ExternalMemoryApp(MDApp): # <- main class
 			rating.dispatch("on_active", segment)
 
 	def display_library(self):
-			library = self.database.read(["*"], "DATA")
-			output = "\n"
-			rating = ["productRatingBad", "productRatingMeh", "productRatingGood"]
-			if library:
-				for item in library:
-					output += f"{item[0]}: {item[1]} - {self.text.elements[rating[item[3]]][self.text.selectedLanguage]}\n{item[2]}\n\n"
-			return output
-	
+		library = self.database.read(["*"], "DATA")
+		rating = ["productRatingBad", "productRatingMeh", "productRatingGood"]
+		if hasattr(self, "grid"):
+			self.screen.ids["libraryLocal"].remove_widget(self.grid)
+		if library:
+			self.grid = MDGridLayout(
+				size_hint = (1, None),
+				adaptive_height = True,
+				adaptive_width = False,
+				pos_hint = {'center': (.5, .5)},
+				cols = 2,
+				spacing = [10,20]
+			)
+			for item in library:
+				self.grid.add_widget(
+					MDLabel(
+						text = f"{item[0]}: {item[1]} - {self.text.elements[rating[item[3]]][self.text.selectedLanguage]}\n{item[2]}",
+						size_hint = (.9, None ),
+						adaptive_height = True,
+					)
+				)
+				self.grid.add_widget(
+					MDIconButton(
+						icon = "trash-can-outline",
+						text = item[0],
+						pos_hint = {"center_x": 0.5, "center_y": 0.5},
+						on_release = lambda x : self.delete_and_update_library(x.text),
+						size_hint= (.1, None )
+					)
+				)
+			self.screen.ids["libraryLocal"].add_widget(self.grid)
+
+	def delete_and_update_library(self, id):
+		if id:
+			self.database.delete("DATA", {"id": id})
+			self.display_library()
+
 	def weblink(self, url):
 		webbrowser.open(url)
 

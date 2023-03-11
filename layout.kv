@@ -30,6 +30,9 @@
     height: dp(24)
 	pos_hint: {'center_x': .5, 'center_y': .1}
 
+<MDScrollView>
+    size_hint: (1, 1)
+
 <Scrollable@MDLabel>
     size_hint_y: None
     height: self.texture_size[1]
@@ -123,9 +126,7 @@ MDScreen:
                 size_hint: (1, None)
 				height: dp(24)
             MDScrollView:
-                Scrollable:
-                    id: libraryLocal
-                    text: app.display_library()
+                id: libraryLocal
         ScreenLayout:
             TwoColumns:
                 size_hint: 1, None
