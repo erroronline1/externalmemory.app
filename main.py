@@ -6,7 +6,6 @@ from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.properties import StringProperty, ObjectProperty
-from kivy.animation import Animation
 
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import OneLineIconListItem
@@ -14,7 +13,7 @@ from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.label import MDLabel
+from kivymd.uix.card import MDCardSwipe
 from kivy.clock import Clock
 from kivy.uix.camera import Camera
 
@@ -28,10 +27,14 @@ from platformhandler import platform_handler
 import database
 
 os.environ["KIVY_ORIENTATION"] = "Portrait"
+Window.softinput_mode = "below_target"
 
 class IconListItem(OneLineIconListItem):
 	icon = StringProperty()
 
+class SwipeToDeleteItem(MDCardSwipe):
+    text = StringProperty()
+    
 class CamImage(Camera):
 	pass
 
@@ -45,7 +48,6 @@ class ExternalMemoryApp(MDApp): # <- main class
 	dialog = None
 	currentRating = 2
 	dbname = "ExternalMemory.app.db"
-	selected = None
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.platform = platform_handler()
@@ -66,6 +68,7 @@ class ExternalMemoryApp(MDApp): # <- main class
 
 	def build(self):
 		self.theme_cls.theme_style = "Dark"
+		self.theme_cls.device_orientation = "portrait"
 		self.icon = r'assets/app_icon.png'
 		dropdown_options = self.dropdown_options()
 		self.settingLanguageDropdown = self.dropdown_generator(dropdown_options["languageSetting"])
@@ -231,56 +234,21 @@ class ExternalMemoryApp(MDApp): # <- main class
 		if library:
 			for item in library:
 				self.screen.ids["libraryLocal"].add_widget(
-					MDLabel(
-						text = f"{item[0]}: {item[1]} - {self.text.elements[rating[item[3]]][self.text.selectedLanguage]}\n{item[2]}",
-						size_hint = (.9, None ),
-						adaptive_height = True,
+					SwipeToDeleteItem(
+						text = f"{item[0]}: {item[1]} - {self.text.elements[rating[item[3]]][self.text.selectedLanguage]}\n{item[2]}"
 					)
 				)
 
-	def set_selection_mode(self, instance_selection_list, mode):
-		if mode:
-			md_bg_color = self.theme_cls.primary_light
-			left_action_items = [
-				[
-					"close",
-					lambda x: self.root.ids.libraryLocal.unselected_all(),
-				]
-			]
-			right_action_items = [["search-web", lambda x: self.lookup_library_items()], ["trash-can-outline", lambda x: self.delete_and_update_library()]]
-		else:
-			md_bg_color = self.theme_cls.primary_color
-			left_action_items = []
-			right_action_items = [["search-web", lambda x: self.lookup_library_items()], ['dots-vertical', lambda x: self.root.ids.nav_drawer.set_state("open")]]
-			self.root.ids.toolbar.title = self.text.get("menuLibrary")
-			self.selected = None
+	def delete_item(self, instance):
+		id = re.findall(r"^([^\n\r]+?)(?=$|: \d{4}\-)", instance.text, re.MULTILINE)[0]
+		if id:
+			self.database.delete("DATA", {"id": id})
+		self.screen.ids.libraryLocal.remove_widget(instance)
 
-		Animation(md_bg_color=md_bg_color, d=0.2).start(self.root.ids.toolbar)
-		self.root.ids.toolbar.left_action_items = left_action_items
-		self.root.ids.toolbar.right_action_items = right_action_items
-
-	def on_selected(self, instance_selection_list, instance_selection_item):
-		self.root.ids.toolbar.title = str(len(instance_selection_list.get_selected_list_items()))
-		self.selected=[re.findall(r"^([^\n\r]+?)(?:: \d{4}\-\d{2}\-\d{2} \- .+?)$", item.instance_item.text, re.MULTILINE)[0] for item in instance_selection_list.get_selected_list_items()]
-
-	def on_unselected(self, instance_selection_list, instance_selection_item):
-		if instance_selection_list.get_selected_list_items():
-			self.root.ids.toolbar.title = str(len(instance_selection_list.get_selected_list_items()))
-			self.selected=[re.findall(r"^([^\n\r]+?)(?:: \d{4}\-\d{2}\-\d{2} \- .+?)$", item.instance_item.text, re.MULTILINE)[0] for item in instance_selection_list.get_selected_list_items()]
-		
-	def delete_and_update_library(self):
-		if self.selected:
-			for entry in self.selected:
-				self.database.delete("DATA", {"id": entry})
-			self.display_library()
-
-	def lookup_library_items(self):
-		search = ""
-		if self.selected:
-			for entry in self.selected:
-				search += re.findall(r"^.+?\| ([^\n\r]+?)$", entry, re.MULTILINE)[0] + " "
-		elif self.platform.found_barcode:
-			search = self.platform.found_barcode
+	def lookup_item(self, search = ""):
+		if not search:
+			return
+		search = re.findall(r"^.+?\| ([^\n\r]+?)(?=$|: \d{4}\-)", search, re.MULTILINE)[0]
 		if search:
 			self.weblink(f"https://ecosia.org/search?q={search}")
 

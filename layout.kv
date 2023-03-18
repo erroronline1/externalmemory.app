@@ -48,6 +48,31 @@
 <MDSegmentedControlItem>
 	color: app.theme_cls.primary_color
 
+<SwipeToDeleteItem>:
+	size_hint_y: None
+	height: content.height
+	md_bg_color: app.theme_cls.bg_normal
+	MDCardSwipeLayerBox:
+		padding: "8dp"
+		border_radius: 12
+		radius: [10]
+		MDIconButton:
+			icon: "trash-can"
+			pos_hint: {"center_y": .5}
+			on_release: app.delete_item(root)
+	MDCardSwipeFrontBox:
+		md_bg_color: app.theme_cls.bg_normal
+		TwoColumns:
+			MDLabel:
+				id: content
+				text: root.text
+				size_hint_y: None
+				padding: [0, 20]
+				height: self.texture_size[1]
+			MDIconButton:
+				icon: "search-web"
+				on_release: app.lookup_item(root.text)
+
 <ContentNavigationDrawer>
 	MDList:
 		size_hint: 1,1
@@ -85,7 +110,7 @@ MDBoxLayout:
 		title: app.text.get("menuMain")
 		elevation: 0
 		right_action_items:
-			[["search-web", lambda x: app.lookup_library_items()], ['dots-vertical', lambda x: nav_drawer.set_state("open")]]
+			[['menu', lambda x: nav_drawer.set_state("open")]]
 
 	MDNavigationLayout:
 		MDScreenManager:
@@ -108,12 +133,17 @@ MDBoxLayout:
 									origin: self.center
 							canvas.after:
 								PopMatrix
-					MDTextField:
-						id: productCode
-						hint_text: app.text.get("productCode")
-						size_hint: (1, None)
-						height: dp(24)
-						disabled: True
+					TwoColumns:
+						MDTextField:
+							id: productCode
+							hint_text: app.text.get("productCode")
+							size_hint: (1, None)
+							height: dp(24)
+							disabled: True
+						MDIconButton:
+							icon: "search-web"
+							pos_hint: {"center_y": .5}
+							on_release: app.lookup_item(productCode.text)
 					MDTextField:
 						id: productRateDate
 						hint_text: app.text.get("productRateDate")
@@ -123,7 +153,6 @@ MDBoxLayout:
 					MDTextField:
 						id: productNotes
 						multiline: True
-						max_text_length: 180
 						size_hint: (1, .5)
 						hint_text: app.text.get("productNotes")
 					MDSegmentedControl:
@@ -157,12 +186,8 @@ MDBoxLayout:
 				name: "libraryScreen"
 				ScreenLayout:
 					MDScrollView:
-						MDSelectionList:
+						MDList:
 							id: libraryLocal
-							overlay_color: (1, 1, 1, .5)
-							on_selected: app.on_selected(*args)
-							on_unselected: app.on_unselected(*args)
-							on_selected_mode: app.set_selection_mode(*args)
 			MDScreen:
 				name: "settingsScreen"
 				ScreenLayout:

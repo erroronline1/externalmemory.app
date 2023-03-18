@@ -9,8 +9,8 @@ class Language():
 			"deutsch": "Scannen",
 		},
 		"menuLibrary": {
-			"english": "Library",
-			"deutsch": "Bibliothek",
+			"english": "Library - swipe to delete",
+			"deutsch": "Bibliothek - zum löschen wischen",
 		},
 		"menuSettings": {
 			"english": "Settings",
