@@ -4,6 +4,19 @@ import random
 class Language():
 	# text chunks. extend elements at your convenience
 	elements={
+		"menuMain": {
+			"english": "Scan",
+			"deutsch": "Scannen",
+		},
+		"menuLibrary": {
+			"english": "Library",
+			"deutsch": "Bibliothek",
+		},
+		"menuSettings": {
+			"english": "Settings",
+			"deutsch": "Einstellungen",
+		},
+
 		"productCode": {
 			"english": "detected code",
 			"deutsch": "erkannter Code",
@@ -35,11 +48,6 @@ class Language():
 		"productSave": {
 			"english": "save product",
 			"deutsch": "Produkt speichern",
-		},
-
-		"libraryTitle": {
-			"english": "Your Library",
-			"deutsch": "Deine Bibliothek",
 		},
 
 		"settingLanguageLabel": {

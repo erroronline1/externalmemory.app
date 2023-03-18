@@ -16,151 +16,198 @@
 	spacing: [10,20]
 
 <DropdownLabel@MDLabel>
-    size_hint: (1, None)
-    height: dp(24)
+	size_hint: (1, None)
+	height: dp(24)
 	pos_hint: {'center': (.5, .5)}
 
 <IconListItem>
-    IconLeftWidget:
+	IconLeftWidget:
 		pos_hint: {'center_x': .5, 'center_y': .5}
-        icon: root.icon
+		icon: root.icon
 
 <Dropdown@MDDropDownItem>
-    size_hint: (1, None)
-    height: dp(24)
+	size_hint: (1, None)
+	height: dp(24)
 	pos_hint: {'center_x': .5, 'center_y': .1}
 
 <MDScrollView>
-    size_hint: (1, 1)
+	size_hint: (1, 1)
 
 <Scrollable@MDLabel>
-    size_hint_y: None
-    height: self.texture_size[1]
-    color: app.theme_cls.opposite_bg_darkest
+	size_hint_y: None
+	height: self.texture_size[1]
+	color: app.theme_cls.opposite_bg_darkest
 
 <MDLabel>
-    color: app.theme_cls.primary_color
+	color: app.theme_cls.primary_color
 
 <MDTextfield>
-    foreground_color: app.theme_cls.opposite_bg_darkest
-    disabled_foreground_color: app.theme_cls.primary_color
+	foreground_color: app.theme_cls.opposite_bg_darkest
+	disabled_foreground_color: app.theme_cls.primary_color
 
 <MDSegmentedControlItem>
-    color: app.theme_cls.primary_color
+	color: app.theme_cls.primary_color
 
-MDScreen:
-    MDCarousel:
-        id: carousel
-        on_slide_complete: libraryLocal.text = app.display_library()
-        on_slide_complete: camImage.play = self.slides.index(self.current_slide) == 0
-        ScreenLayout:
-            MDBoxLayout:
-                size_hint: (1, .5)
-                padding: dp(0)
-                CamImage:
-                    id: camImage
-                    angle: 0
-                    index: 0
-                    play: True
-                    canvas.before:
-                        PushMatrix
-                        Rotate:
-                            angle: self.angle
-                            origin: self.center
-                    canvas.after:
-                        PopMatrix
-			MDTextField:
-				id: productCode
-				hint_text: app.text.get("productCode")
-				size_hint: (1, None)
-				height: dp(24)
-                disabled: True
-            MDFillRoundFlatIconButton:
-                id: productLookup
-                icon: "search-web"
-                text: app.text.get("productLookup")
-                disabled: not bool("|" in productCode.text and len(productCode.text[productCode.text.index("|")+1:]))
-                on_release: app.weblink("https://www.ecosia.org/search?q=" + productCode.text.replace("|",""))
-			MDTextField:
-				id: productRateDate
-				hint_text: app.text.get("productRateDate")
-				size_hint: (1, None)
-				height: dp(24)
-                disabled: True
-            MDTextField:
-                id: productNotes
-				multiline: True
-				size_hint: (1, .5)
-                hint_text: app.text.get("productNotes")
-            MDSegmentedControl:
-                adaptive_width: True
-                size_hint: 1, None
-                id: productRating
-                pos_hint: {"center_x": .5, "center_y": .5}
-                on_active: app.set_current_rating(*args)
-                MDSegmentedControlItem:
-                    id: productRatingGood
-                    text: app.text.get("productRatingGood")
-                    size_hint: .3, 1
-                    size_hint_max_x: dp(110)
-                MDSegmentedControlItem:
-                    id: productRatingMeh
-                    text: app.text.get("productRatingMeh")
-                    size_hint: .3, 1
-                    size_hint_max_x: dp(110)
-                MDSegmentedControlItem:
-                    id: productRatingBad
-                    text: app.text.get("productRatingBad")
-                    size_hint: .3, 1
-                    size_hint_max_x: dp(110)
-            MDFillRoundFlatIconButton:
-                id: productSave
-                icon: "content-save-outline"
-                text: app.text.get("productSave")
-                disabled: not bool("|" in productCode.text and len(productCode.text[productCode.text.index("|")+1:]))
-                on_release: app.save_inputs()
-        ScreenLayout:
-            MDLabel:
-                id: libraryTitle
-                text: app.text.get("libraryTitle")
-                size_hint: (1, None)
-				height: dp(24)
-            MDScrollView:
-                id: libraryLocal
-        ScreenLayout:
-            TwoColumns:
-                size_hint: 1, None
-                DropdownLabel:
-                    id: settingLanguageLabel
-                    text: app.text.get("settingLanguageLabel")
-                Dropdown:
-                    id: settingLanguageSelection
-                    text: app.text.selectedLanguage
-                    on_release: app.settingLanguageDropdown["settingLanguageSelection"].open()
-					on_text: app.translate(settingLanguageSelection.text)
-    				on_text: app.save_setting("lang", settingLanguageSelection.text)
-            MDFillRoundFlatIconButton:
-                id: settingClearLocal
-                icon: "trash-can-outline"
-                text: app.text.get("settingClearLocal")
-				on_release: app.cancel_confirm_dialog(app.text.get("settingClearLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmClearLocal"))
-            MDFillRoundFlatIconButton:
-                id: settingExportLocal
-                icon: "database-export-outline"
-                text: app.text.get("settingExportLocal")
-				on_release: app.cancel_confirm_dialog(app.text.get("settingExportLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmExportLocal"))
-            MDFillRoundFlatIconButton:
-                id: settingImportLocal
-                icon: "database-import-outline"
-                text: app.text.get("settingImportLocal")
-				on_release: app.cancel_confirm_dialog(app.text.get("settingImportLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmImportLocal"))
-            MDScrollView:
-                Scrollable:
-                    id: settingInfo
-                    text: app.text.get("settingInfo")
-            MDRectangleFlatIconButton:
-                center_x: .5
-                text: "github.com/erroronline1/externalmemory.app"
-                icon: "github"
-                line_color: (0, 0, 0, 0)
-                on_release: app.weblink("https://github.com/erroronline1/externalmemory.app")
+<ContentNavigationDrawer>
+	MDList:
+		size_hint: 1,1
+		OneLineListItem:
+			id: menuMain
+			text: app.text.get("menuMain")
+			on_press:
+				root.nav_drawer.set_state("close")
+				root.screen_manager.current = "mainScreen"
+				root.toolbar.title = app.text.get("menuMain")
+				root.camImage.play = True
+		OneLineListItem:
+			id: menuLibrary
+			text: app.text.get("menuLibrary")
+			on_press:
+				root.nav_drawer.set_state("close")
+				root.screen_manager.current = "libraryScreen"
+				root.toolbar.title = app.text.get("menuLibrary")
+				root.camImage.play = False
+				app.display_library()
+		OneLineListItem:
+			id: menuSettings
+			text: app.text.get("menuSettings")
+			on_press:
+				root.nav_drawer.set_state("close")
+				root.screen_manager.current = "settingsScreen"
+				root.toolbar.title = app.text.get("menuSettings")
+				root.camImage.play = False
+
+MDBoxLayout:
+	orientation: "vertical"
+
+	MDTopAppBar:
+		id: toolbar
+		title: app.text.get("menuMain")
+		elevation: 0
+		right_action_items:
+			[["search-web", lambda x: app.lookup_library_items()], ['dots-vertical', lambda x: nav_drawer.set_state("open")]]
+
+	MDNavigationLayout:
+		MDScreenManager:
+			id: screen_manager
+			MDScreen:
+				name: "mainScreen"
+				ScreenLayout:
+					MDBoxLayout:
+						size_hint: (1, .5)
+						padding: dp(0)
+						CamImage:
+							id: camImage
+							angle: 0
+							index: 0
+							play: True
+							canvas.before:
+								PushMatrix
+								Rotate:
+									angle: self.angle
+									origin: self.center
+							canvas.after:
+								PopMatrix
+					MDTextField:
+						id: productCode
+						hint_text: app.text.get("productCode")
+						size_hint: (1, None)
+						height: dp(24)
+						disabled: True
+					MDTextField:
+						id: productRateDate
+						hint_text: app.text.get("productRateDate")
+						size_hint: (1, None)
+						height: dp(24)
+						disabled: True
+					MDTextField:
+						id: productNotes
+						multiline: True
+						max_text_length: 180
+						size_hint: (1, .5)
+						hint_text: app.text.get("productNotes")
+					MDSegmentedControl:
+						adaptive_width: True
+						size_hint: 1, None
+						id: productRating
+						pos_hint: {"center_x": .5, "center_y": .5}
+						on_active: app.set_current_rating(*args)
+						MDSegmentedControlItem:
+							id: productRatingGood
+							text: app.text.get("productRatingGood")
+							size_hint: .3, 1
+							size_hint_max_x: dp(110)
+						MDSegmentedControlItem:
+							id: productRatingMeh
+							text: app.text.get("productRatingMeh")
+							size_hint: .3, 1
+							size_hint_max_x: dp(110)
+						MDSegmentedControlItem:
+							id: productRatingBad
+							text: app.text.get("productRatingBad")
+							size_hint: .3, 1
+							size_hint_max_x: dp(110)
+					MDFillRoundFlatIconButton:
+						id: productSave
+						icon: "content-save-outline"
+						text: app.text.get("productSave")
+						disabled: not bool("|" in productCode.text and len(productCode.text[productCode.text.index("|")+1:]))
+						on_release: app.save_inputs()
+			MDScreen:
+				name: "libraryScreen"
+				ScreenLayout:
+					MDScrollView:
+						MDSelectionList:
+							id: libraryLocal
+							overlay_color: (1, 1, 1, .5)
+							on_selected: app.on_selected(*args)
+							on_unselected: app.on_unselected(*args)
+							on_selected_mode: app.set_selection_mode(*args)
+			MDScreen:
+				name: "settingsScreen"
+				ScreenLayout:
+					TwoColumns:
+						size_hint: 1, None
+						DropdownLabel:
+							id: settingLanguageLabel
+							text: app.text.get("settingLanguageLabel")
+						Dropdown:
+							id: settingLanguageSelection
+							text: app.text.selectedLanguage
+							on_release: app.settingLanguageDropdown["settingLanguageSelection"].open()
+							on_text: app.translate(settingLanguageSelection.text)
+							on_text: app.save_setting("lang", settingLanguageSelection.text)
+					MDFillRoundFlatIconButton:
+						id: settingClearLocal
+						icon: "trash-can-outline"
+						text: app.text.get("settingClearLocal")
+						on_release: app.cancel_confirm_dialog(app.text.get("settingClearLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmClearLocal"))
+					MDFillRoundFlatIconButton:
+						id: settingExportLocal
+						icon: "database-export-outline"
+						text: app.text.get("settingExportLocal")
+						on_release: app.cancel_confirm_dialog(app.text.get("settingExportLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmExportLocal"))
+					MDFillRoundFlatIconButton:
+						id: settingImportLocal
+						icon: "database-import-outline"
+						text: app.text.get("settingImportLocal")
+						on_release: app.cancel_confirm_dialog(app.text.get("settingImportLocalConfirm"), app.text.get("settingDecline"), app.text.get("settingConfirmImportLocal"))
+					MDScrollView:
+						Scrollable:
+							id: settingInfo
+							text: app.text.get("settingInfo")
+					MDRectangleFlatIconButton:
+						center_x: .5
+						text: "github.com/erroronline1/externalmemory.app"
+						icon: "github"
+						line_color: (0, 0, 0, 0)
+						on_release: app.weblink("https://github.com/erroronline1/externalmemory.app")
+		MDNavigationDrawer:
+			id: nav_drawer
+			radius: (0, 16, 16, 0)
+			anchor: "right"
+			ContentNavigationDrawer:
+				screen_manager: screen_manager
+				nav_drawer: nav_drawer
+				camImage: camImage
+				toolbar: toolbar
