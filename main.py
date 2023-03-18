@@ -5,20 +5,21 @@ from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.core.window import Window
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, ObjectProperty
+from kivy.animation import Animation
 
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
-from kivymd.uix.button import MDIconButton
 from kivy.clock import Clock
 from kivy.uix.camera import Camera
 
 import os
+import re
 import webbrowser
 from datetime import datetime
 
@@ -34,10 +35,17 @@ class IconListItem(OneLineIconListItem):
 class CamImage(Camera):
 	pass
 
+class ContentNavigationDrawer(MDBoxLayout):
+	screen_manager = ObjectProperty()
+	nav_drawer = ObjectProperty()
+	camImage = ObjectProperty()
+	toolbar = ObjectProperty()
+
 class ExternalMemoryApp(MDApp): # <- main class
 	dialog = None
 	currentRating = 2
 	dbname = "ExternalMemory.app.db"
+	selected = None
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.platform = platform_handler()
@@ -219,40 +227,62 @@ class ExternalMemoryApp(MDApp): # <- main class
 	def display_library(self):
 		library = self.database.read(["*"], "DATA")
 		rating = ["productRatingBad", "productRatingMeh", "productRatingGood"]
-		if hasattr(self, "grid"):
-			self.screen.ids["libraryLocal"].remove_widget(self.grid)
+		self.screen.ids["libraryLocal"].clear_widgets()
 		if library:
-			self.grid = MDGridLayout(
-				size_hint = (1, None),
-				adaptive_height = True,
-				adaptive_width = False,
-				pos_hint = {'center': (.5, .5)},
-				cols = 2,
-				spacing = [10,20]
-			)
 			for item in library:
-				self.grid.add_widget(
+				self.screen.ids["libraryLocal"].add_widget(
 					MDLabel(
 						text = f"{item[0]}: {item[1]} - {self.text.elements[rating[item[3]]][self.text.selectedLanguage]}\n{item[2]}",
 						size_hint = (.9, None ),
 						adaptive_height = True,
 					)
 				)
-				self.grid.add_widget(
-					MDIconButton(
-						icon = "trash-can-outline",
-						text = item[0],
-						pos_hint = {"center_x": 0.5, "center_y": 0.5},
-						on_release = lambda x : self.delete_and_update_library(x.text),
-						size_hint= (.1, None )
-					)
-				)
-			self.screen.ids["libraryLocal"].add_widget(self.grid)
 
-	def delete_and_update_library(self, id):
-		if id:
-			self.database.delete("DATA", {"id": id})
+	def set_selection_mode(self, instance_selection_list, mode):
+		if mode:
+			md_bg_color = self.theme_cls.primary_light
+			left_action_items = [
+				[
+					"close",
+					lambda x: self.root.ids.libraryLocal.unselected_all(),
+				]
+			]
+			right_action_items = [["search-web", lambda x: self.lookup_library_items()], ["trash-can-outline", lambda x: self.delete_and_update_library()]]
+		else:
+			md_bg_color = self.theme_cls.primary_color
+			left_action_items = []
+			right_action_items = [["search-web", lambda x: self.lookup_library_items()], ['dots-vertical', lambda x: self.root.ids.nav_drawer.set_state("open")]]
+			self.root.ids.toolbar.title = self.text.get("menuLibrary")
+			self.selected = None
+
+		Animation(md_bg_color=md_bg_color, d=0.2).start(self.root.ids.toolbar)
+		self.root.ids.toolbar.left_action_items = left_action_items
+		self.root.ids.toolbar.right_action_items = right_action_items
+
+	def on_selected(self, instance_selection_list, instance_selection_item):
+		self.root.ids.toolbar.title = str(len(instance_selection_list.get_selected_list_items()))
+		self.selected=[re.findall(r"^([^\n\r]+?)(?:: \d{4}\-\d{2}\-\d{2} \- .+?)$", item.instance_item.text, re.MULTILINE)[0] for item in instance_selection_list.get_selected_list_items()]
+
+	def on_unselected(self, instance_selection_list, instance_selection_item):
+		if instance_selection_list.get_selected_list_items():
+			self.root.ids.toolbar.title = str(len(instance_selection_list.get_selected_list_items()))
+			self.selected=[re.findall(r"^([^\n\r]+?)(?:: \d{4}\-\d{2}\-\d{2} \- .+?)$", item.instance_item.text, re.MULTILINE)[0] for item in instance_selection_list.get_selected_list_items()]
+		
+	def delete_and_update_library(self):
+		if self.selected:
+			for entry in self.selected:
+				self.database.delete("DATA", {"id": entry})
 			self.display_library()
+
+	def lookup_library_items(self):
+		search = ""
+		if self.selected:
+			for entry in self.selected:
+				search += re.findall(r"^.+?\| ([^\n\r]+?)$", entry, re.MULTILINE)[0] + " "
+		elif self.platform.found_barcode:
+			search = self.platform.found_barcode
+		if search:
+			self.weblink(f"https://ecosia.org/search?q={search}")
 
 	def weblink(self, url):
 		webbrowser.open(url)
