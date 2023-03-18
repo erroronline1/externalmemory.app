@@ -45,6 +45,7 @@ class WinChooser():
 class platform_handler():
 	imgframe = None
 	stringdestination = None
+	found_barcode = None
 	def __init__(self):
 		if platform=="android":
 			from android.permissions import Permission, request_permissions, check_permission
@@ -87,6 +88,7 @@ class platform_handler():
 			if self.stringdestination and detectedCode:
 				self.stringdestination.text = detectedCode
 				self.prefill_inputs(detectedCode)
+				self.found_barcode = barcode.data.decode('utf-8')
 
 	def adjustCamera(self):
 		if platform != "android":
